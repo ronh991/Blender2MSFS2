@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The glTF-Blender-IO authors.
+# Copyright 2018-2021 The glTF-Blender-IO authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,36 +29,61 @@ from .gltf2_io_user_extensions import export_user_extensions
 
 @cached
 def gather_image(
-        blender_shader_sockets_or_texture_slots: typing.Union[typing.Tuple[bpy.types.NodeSocket],
-                                                              typing.Tuple[bpy.types.Texture]],
+        blender_shader_sockets: typing.Tuple[bpy.types.NodeSocket],
         export_settings):
-    if not __filter_image(blender_shader_sockets_or_texture_slots, export_settings):
+    if not __filter_image(blender_shader_sockets, export_settings):
         return None
 
-    image_data = __get_image_data(blender_shader_sockets_or_texture_slots, export_settings)
+    image_data = __get_image_data(blender_shader_sockets, export_settings)
     if image_data.empty():
         # The export image has no data
         return None
 
-    mime_type = __gather_mime_type(blender_shader_sockets_or_texture_slots, image_data, export_settings)
+    mime_type = __gather_mime_type(blender_shader_sockets, image_data, export_settings)
     name = __gather_name(image_data, export_settings)
 
-    uri = __gather_uri(image_data, mime_type, name, export_settings)
+    if image_data.original is None:
+        uri = __gather_uri(image_data, mime_type, name, export_settings)
+    else:
+        # Retrieve URI relative to exported glTF files
+        uri = __gather_original_uri(image_data.original.filepath, export_settings)
+
     buffer_view = __gather_buffer_view(image_data, mime_type, name, export_settings)
 
     image = __make_image(
         buffer_view,
-        __gather_extensions(blender_shader_sockets_or_texture_slots, export_settings),
-        __gather_extras(blender_shader_sockets_or_texture_slots, export_settings),
+        __gather_extensions(blender_shader_sockets, export_settings),
+        __gather_extras(blender_shader_sockets, export_settings),
         mime_type,
         name,
         uri,
         export_settings
     )
 
-    export_user_extensions('gather_image_hook', export_settings, image, blender_shader_sockets_or_texture_slots)
+    export_user_extensions('gather_image_hook', export_settings, image, blender_shader_sockets)
 
     return image
+
+def __gather_original_uri(original_uri, export_settings):
+
+    def _path_to_uri(path):
+        import urllib
+        path = os.path.normpath(path)
+        path = path.replace(os.sep, '/')
+        return urllib.parse.quote(path)
+
+    path_to_image = bpy.path.abspath(original_uri)
+    if not os.path.exists(path_to_image): return None
+    try:
+        rel_path = os.path.relpath(
+            path_to_image,
+            start=export_settings[gltf2_blender_export_keys.FILE_DIRECTORY],
+        )
+    except ValueError:
+        # eg. because no relative path between C:\ and D:\ on Windows
+        return None
+    return _path_to_uri(rel_path)
+
 
 @cached
 def __make_image(buffer_view, extensions, extras, mime_type, name, uri, export_settings):
@@ -72,8 +97,8 @@ def __make_image(buffer_view, extensions, extras, mime_type, name, uri, export_s
     )
 
 
-def __filter_image(sockets_or_slots, export_settings):
-    if not sockets_or_slots:
+def __filter_image(sockets, export_settings):
+    if not sockets:
         return False
     return True
 
@@ -85,22 +110,27 @@ def __gather_buffer_view(image_data, mime_type, name, export_settings):
     return None
 
 
-def __gather_extensions(sockets_or_slots, export_settings):
+def __gather_extensions(sockets, export_settings):
     return None
 
 
-def __gather_extras(sockets_or_slots, export_settings):
+def __gather_extras(sockets, export_settings):
     return None
 
 
-def __gather_mime_type(sockets_or_slots, export_image, export_settings):
+def __gather_mime_type(sockets, export_image, export_settings):
     # force png if Alpha contained so we can export alpha
-    for socket in sockets_or_slots:
+    for socket in sockets:
         if socket.name == "Alpha":
             return "image/png"
 
     if export_settings["gltf_image_format"] == "AUTO":
-        image = export_image.blender_image()
+        if export_image.original is None: # We are going to create a new image
+            image = export_image.blender_image()
+        else:
+            # Using original image
+            image = export_image.original
+
         if image is not None and __is_blender_image_a_jpeg(image):
             return "image/jpeg"
         return "image/png"
@@ -110,31 +140,33 @@ def __gather_mime_type(sockets_or_slots, export_image, export_settings):
 
 
 def __gather_name(export_image, export_settings):
-    # Find all Blender images used in the ExportImage
-    imgs = []
-    for fill in export_image.fills.values():
-        if isinstance(fill, FillImage):
-            img = fill.image
-            if img not in imgs:
-                imgs.append(img)
+    if export_image.original is None:
+        # Find all Blender images used in the ExportImage
+        imgs = []
+        for fill in export_image.fills.values():
+            if isinstance(fill, FillImage):
+                img = fill.image
+                if img not in imgs:
+                    imgs.append(img)
 
-    # If all the images have the same path, use the common filename
-    filepaths = set(img.filepath for img in imgs)
-    if len(filepaths) == 1:
-        filename = os.path.basename(list(filepaths)[0])
-        name, extension = os.path.splitext(filename)
-        if extension.lower() in ['.png', '.jpg', '.jpeg']:
-            if name:
-                return name
+        # If all the images have the same path, use the common filename
+        filepaths = set(img.filepath for img in imgs)
+        if len(filepaths) == 1:
+            filename = os.path.basename(list(filepaths)[0])
+            name, extension = os.path.splitext(filename)
+            if extension.lower() in ['.png', '.jpg', '.jpeg']:
+                if name:
+                    return name
 
-    # Combine the image names: img1-img2-img3
-    names = []
-    for img in imgs:
-        name, extension = os.path.splitext(img.name)
-        names.append(name)
-    name = '-'.join(names)
-    return name or 'Image'
-
+        # Combine the image names: img1-img2-img3
+        names = []
+        for img in imgs:
+            name, extension = os.path.splitext(img.name)
+            names.append(name)
+        name = '-'.join(names)
+        return name or 'Image'
+    else:
+        return export_image.original.name
 
 
 @cached
@@ -150,33 +182,33 @@ def __gather_uri(image_data, mime_type, name, export_settings):
     return None
 
 
-def __is_socket(sockets_or_slots):
-    return isinstance(sockets_or_slots[0], bpy.types.NodeSocket)
-
-
-def __is_slot(sockets_or_slots):
-    return isinstance(sockets_or_slots[0], bpy.types.MaterialTextureSlot)
-
-
-def __get_image_data(sockets_or_slots, export_settings) -> ExportImage:
+def __get_image_data(sockets, export_settings) -> ExportImage:
     # For shared resources, such as images, we just store the portion of data that is needed in the glTF property
     # in a helper class. During generation of the glTF in the exporter these will then be combined to actual binary
     # resources.
-    if __is_socket(sockets_or_slots):
-        results = [__get_tex_from_socket(socket, export_settings) for socket in sockets_or_slots]
-        composed_image = ExportImage()
-        for result, socket in zip(results, sockets_or_slots):
-            if result.shader_node.image.channels == 0:
-                gltf2_io_debug.print_console("WARNING",
-                                             "Image '{}' has no color channels and cannot be exported.".format(
-                                                 result.shader_node.image))
-                continue
+    results = [__get_tex_from_socket(socket, export_settings) for socket in sockets]
+    composed_image = ExportImage()
+    for result, socket in zip(results, sockets):
+        if result.shader_node.image.channels == 0:
+            gltf2_io_debug.print_console("WARNING",
+                                         "Image '{}' has no color channels and cannot be exported.".format(
+                                             result.shader_node.image))
+            continue
 
+        # Assume that user know what he does, and that channels/images are already combined correctly for pbr
+        # If not, we are going to keep only the first texture found
+        # Example : If user set up 2 or 3 different textures for Metallic / Roughness / Occlusion
+        # Only 1 will be used at export
+        # This Warning is displayed in UI of this option
+        if export_settings['gltf_keep_original_textures']:
+            composed_image = ExportImage.from_original(result.shader_node.image)
+
+        else:
             # rudimentarily try follow the node tree to find the correct image data.
             src_chan = Channel.R
             for elem in result.path:
                 if isinstance(elem.from_node, bpy.types.ShaderNodeSeparateRGB):
-                   src_chan = {
+                    src_chan = {
                         'R': Channel.R,
                         'G': Channel.G,
                         'B': Channel.B,
@@ -191,9 +223,9 @@ def __get_image_data(sockets_or_slots, export_settings) -> ExportImage:
                 dst_chan = Channel.B
             elif socket.name == 'Roughness':
                 dst_chan = Channel.G
-            elif socket.name == 'Occlusion' and len(sockets_or_slots) > 1 and sockets_or_slots[1] is not None:
+            elif socket.name == 'Occlusion':
                 dst_chan = Channel.R
-            elif socket.name == 'Alpha' and len(sockets_or_slots) > 1 and sockets_or_slots[1] is not None:
+            elif socket.name == 'Alpha':
                 dst_chan = Channel.A
             elif socket.name == 'Clearcoat':
                 dst_chan = Channel.R
@@ -213,14 +245,8 @@ def __get_image_data(sockets_or_slots, export_settings) -> ExportImage:
                 # copy full image...eventually following sockets might overwrite things
                 composed_image = ExportImage.from_blender_image(result.shader_node.image)
 
-        return composed_image
+    return composed_image
 
-    elif __is_slot(sockets_or_slots):
-        texture = __get_tex_from_slot(sockets_or_slots[0])
-        image = ExportImage.from_blender_image(texture.image)
-        return image
-    else:
-        raise NotImplementedError()
 
 @cached
 def __get_tex_from_socket(blender_shader_socket: bpy.types.NodeSocket, export_settings):
@@ -230,10 +256,6 @@ def __get_tex_from_socket(blender_shader_socket: bpy.types.NodeSocket, export_se
     if not result:
         return None
     return result[0]
-
-
-def __get_tex_from_slot(blender_texture_slot):
-    return blender_texture_slot.texture
 
 
 def __is_blender_image_a_jpeg(image: bpy.types.Image) -> bool:

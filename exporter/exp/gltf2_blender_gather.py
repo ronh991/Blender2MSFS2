@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The glTF-Blender-IO authors.
+# Copyright 2018-2021 The glTF-Blender-IO authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -98,7 +98,8 @@ def __gather_animations(blender_scene, export_settings):
 
             # There is only 1 animation in the track
             # If name of the track is not a default name, use this name for action
-            animations[merged_tracks[merged_anim_track][0]].name = merged_anim_track
+            if len(merged_tracks[merged_anim_track]) != 0:
+                animations[merged_tracks[merged_anim_track][0]].name = merged_anim_track
 
             continue
 
@@ -115,6 +116,10 @@ def __gather_animations(blender_scene, export_settings):
                 continue
 
             to_delete_idx.append(anim_idx)
+
+            # Merging extensions
+            # Provide a hook to handle extension merging since there is no way to know author intent
+            export_user_extensions('merge_animation_extensions_hook', export_settings, animations[anim_idx], animations[base_animation_idx])
 
             # Merging extras
             # Warning, some values can be overwritten if present in multiple merged animations

@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The glTF-Blender-IO authors.
+# Copyright 2018-2021 The glTF-Blender-IO authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -69,6 +69,11 @@ def gather_animation_channels(blender_action: bpy.types.Action,
             bones_to_be_animated, _, _ = gltf2_blender_gather_skins.get_bone_tree(None, blender_object)
             bones_to_be_animated = [blender_object.pose.bones[b.name] for b in bones_to_be_animated]
 
+        list_of_animated_bone_channels = []
+        for channel_group in __get_channel_groups(blender_action, blender_object, export_settings):
+            channel_group_sorted = __get_channel_group_sorted(channel_group, blender_object)
+            list_of_animated_bone_channels.extend([(gltf2_blender_get.get_object_from_datapath(blender_object, get_target_object_path(i.data_path)).name, get_target_property_name(i.data_path)) for i in channel_group])
+
         for bone in bones_to_be_animated:
             for p in ["location", "rotation_quaternion", "scale"]:
                 channel = __gather_animation_channel(
@@ -80,8 +85,10 @@ def gather_animation_channels(blender_action: bpy.types.Action,
                     bake_range_start,
                     bake_range_end,
                     blender_action.name,
-                    None)
-                channels.append(channel)
+                    None,
+                    (bone.name, p) in list_of_animated_bone_channels)
+                if channel is not None:
+                    channels.append(channel)
 
 
         # Retrieve animation on armature object itself, if any
@@ -91,7 +98,7 @@ def gather_animation_channels(blender_action: bpy.types.Action,
             if len(channel_group) == 0:
                 # Only errors on channels, ignoring
                 continue
-            channel = __gather_animation_channel(channel_group, blender_object, export_settings, None, None, bake_range_start, bake_range_end, blender_action.name, None)
+            channel = __gather_animation_channel(channel_group, blender_object, export_settings, None, None, bake_range_start, bake_range_end, blender_action.name, None, False)
             if channel is not None:
                 channels.append(channel)
 
@@ -109,8 +116,10 @@ def gather_animation_channels(blender_action: bpy.types.Action,
                 bake_range_start,
                 bake_range_end,
                 blender_action.name,
-                obj)
-            channels.append(channel)
+                obj,
+                False)
+            if channel is not None:
+                channels.append(channel)
 
     else:
         for channel_group in __get_channel_groups(blender_action, blender_object, export_settings):
@@ -118,7 +127,17 @@ def gather_animation_channels(blender_action: bpy.types.Action,
             if len(channel_group_sorted) == 0:
                 # Only errors on channels, ignoring
                 continue
-            channel = __gather_animation_channel(channel_group_sorted, blender_object, export_settings, None, None, bake_range_start, bake_range_end, blender_action.name, None)
+            channel = __gather_animation_channel(
+                        channel_group_sorted,
+                        blender_object,
+                        export_settings,
+                        None,
+                        None,
+                        bake_range_start,
+                        bake_range_end,
+                        blender_action.name,
+                        None,
+                        False)
             if channel is not None:
                 channels.append(channel)
 
@@ -173,6 +192,9 @@ def __get_channel_group_sorted(channels: typing.Tuple[bpy.types.FCurve], blender
                 else:
                     all_sorted_channels.append(existing_idx[i])
 
+            if all([i is None for i in all_sorted_channels]): # all channel in error, and some non keyed SK
+                return channels             # This happen when an armature action is linked to a mesh object with non keyed SK
+
             return tuple(all_sorted_channels)
 
     # if not shapekeys, stay in same order, because order doesn't matter
@@ -186,17 +208,25 @@ def __gather_animation_channel(channels: typing.Tuple[bpy.types.FCurve],
                                bake_range_start,
                                bake_range_end,
                                action_name: str,
-                               driver_obj
+                               driver_obj,
+                               node_channel_is_animated: bool
                                ) -> typing.Union[gltf2_io.AnimationChannel, None]:
     if not __filter_animation_channel(channels, blender_object, export_settings):
         return None
 
     __target= __gather_target(channels, blender_object, export_settings, bake_bone, bake_channel, driver_obj)
     if __target.path is not None:
+        sampler = __gather_sampler(channels, blender_object, export_settings, bake_bone, bake_channel, bake_range_start, bake_range_end, action_name, driver_obj, node_channel_is_animated)
+
+        if sampler is None:
+            # After check, no need to animate this node for this channel
+            return None
+
+
         animation_channel = gltf2_io.AnimationChannel(
             extensions=__gather_extensions(channels, blender_object, export_settings, bake_bone),
             extras=__gather_extras(channels, blender_object, export_settings, bake_bone),
-            sampler=__gather_sampler(channels, blender_object, export_settings, bake_bone, bake_channel, bake_range_start, bake_range_end, action_name, driver_obj),
+            sampler=sampler,
             target=__target
         )
 
@@ -246,7 +276,8 @@ def __gather_sampler(channels: typing.Tuple[bpy.types.FCurve],
                      bake_range_start,
                      bake_range_end,
                      action_name,
-                     driver_obj
+                     driver_obj,
+                     node_channel_is_animated: bool
                      ) -> gltf2_io.AnimationSampler:
     return gltf2_blender_gather_animation_samplers.gather_animation_sampler(
         channels,
@@ -257,6 +288,7 @@ def __gather_sampler(channels: typing.Tuple[bpy.types.FCurve],
         bake_range_end,
         action_name,
         driver_obj,
+        node_channel_is_animated,
         export_settings
     )
 
@@ -275,6 +307,7 @@ def __gather_target(channels: typing.Tuple[bpy.types.FCurve],
 def __get_channel_groups(blender_action: bpy.types.Action, blender_object: bpy.types.Object, export_settings):
     targets = {}
     multiple_rotation_mode_detected = False
+    delta_rotation_detection = [False, False] # Normal / Delta
     for fcurve in blender_action.fcurves:
         # In some invalid files, channel hasn't any keyframes ... this channel need to be ignored
         if len(fcurve.keyframe_points) == 0:
@@ -315,8 +348,22 @@ def __get_channel_groups(blender_action: bpy.types.Action, blender_object: bpy.t
                     continue
 
         # Detect that object or bone are not multiple keyed for euler and quaternion
-        # Keep only the current rotation mode used by object / bone
-        rotation, rotation_modes = get_rotation_modes(target_property)
+        # Keep only the current rotation mode used by object
+        rotation, delta, rotation_modes = get_rotation_modes(target_property)
+
+        # Delta rotation management
+        if delta is False:
+            if delta_rotation_detection[1] is True: # normal rotation coming, but delta is already present
+                multiple_rotation_mode_detected = True
+                continue
+            delta_rotation_detection[0] = True
+        else:
+            if delta_rotation_detection[0] is True: # delta rotation coming, but normal is already present
+                multiple_rotation_mode_detected = True
+                continue
+            delta_rotation_detection[1] = True
+
+
         if rotation and target.rotation_mode not in rotation_modes:
             multiple_rotation_mode_detected = True
             continue
@@ -344,6 +391,8 @@ def __gather_armature_object_channel_groups(blender_action: bpy.types.Action, bl
     if blender_object.type != "ARMATURE":
         return tuple()
 
+    delta_rotation_detection = [False, False] # Normal / Delta
+
     for fcurve in blender_action.fcurves:
         object_path = get_target_object_path(fcurve.data_path)
         if object_path != "":
@@ -360,8 +409,19 @@ def __gather_armature_object_channel_groups(blender_action: bpy.types.Action, bl
         target = gltf2_blender_get.get_object_from_datapath(blender_object, object_path)
 
         # Detect that armature is not multiple keyed for euler and quaternion
-        # Keep only the current rotation mode used by object
-        rotation, rotation_modes = get_rotation_modes(target_property)
+        # Keep only the current rotation mode used by bone
+        rotation, delta, rotation_modes = get_rotation_modes(target_property)
+
+        # Delta rotation management
+        if delta is False:
+            if delta_rotation_detection[1] is True: # normal rotation coming, but delta is already present
+                continue
+            delta_rotation_detection[0] = True
+        else:
+            if delta_rotation_detection[0] is True: # delta rotation coming, but normal is already present
+                continue
+            delta_rotation_detection[1] = True
+
         if rotation and target.rotation_mode not in rotation_modes:
             continue
 

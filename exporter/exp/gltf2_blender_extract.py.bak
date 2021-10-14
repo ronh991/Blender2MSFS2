@@ -16,7 +16,7 @@ import numpy as np
 from mathutils import Vector
 
 from . import gltf2_blender_export_keys
-from ..com.gltf2_io_debug import print_console
+from ...io.com.gltf2_io_debug import print_console
 from . import gltf2_blender_gather_skins
 
 

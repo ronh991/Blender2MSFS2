@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The glTF-Blender-IO authors.
+# Copyright 2018-2021 The glTF-Blender-IO authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -85,13 +85,13 @@ def __gather_inverse_bind_matrices(blender_object, export_settings):
 
     # traverse the matrices in the same order as the joints and compute the inverse bind matrix
     def __collect_matrices(bone):
-        inverse_bind_matrix = gltf2_blender_math.multiply(
-            axis_basis_change,
-            gltf2_blender_math.multiply(
-                blender_object.matrix_world,
+        inverse_bind_matrix = (
+            axis_basis_change @
+            (
+                blender_object.matrix_world @
                 bone.bone.matrix_local
             )
-        ).inverted()
+        ).inverted_safe()
         matrices.append(inverse_bind_matrix)
 
         if export_settings['gltf_def_bones'] is False:

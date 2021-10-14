@@ -29,8 +29,8 @@ import bpy
 bl_info = {
     'name': 'glTF 2.0 extended format',
     'author': 'Julien Duroure, Scurest, Norbert Nopper, Urs Hanselmann, Moritz Becher, Benjamin Schmithüsen, Jim Eckerlein, and many external contributors. Modified by Otmar Nitsche for use with the Blender2MSFS addon.',
-    "version": (1, 0, 0),
-    'blender': (2, 80, 0),
+    "version": (1, 7, 30),
+    'blender': (2, 91, 0),
     'location': 'File > Export',
     'description': 'Export as extended glTF 2.0 for MSFS',
     'warning': '',
@@ -82,6 +82,45 @@ from bpy_extras.io_utils import ImportHelper, ExportHelper
 #
 
 extension_panel_unregister_functors = []
+
+
+def ensure_filepath_matches_export_format(filepath, export_format):
+    import os
+    filename = os.path.basename(filepath)
+    if not filename:
+        return filepath
+
+    stem, ext = os.path.splitext(filename)
+    if stem.startswith('.') and not ext:
+        stem, ext = '', stem
+
+    desired_ext = '.glb' if export_format == 'GLB' else '.gltf'
+    ext_lower = ext.lower()
+    if ext_lower not in ['.glb', '.gltf']:
+        return filepath + desired_ext
+    elif ext_lower != desired_ext:
+        filepath = filepath[:-len(ext)]  # strip off ext
+        return filepath + desired_ext
+    else:
+        return filepath
+
+
+def on_export_format_changed(self, context):
+    # Update the filename in the file browser when the format (.glb/.gltf)
+    # changes
+    sfile = context.space_data
+    if not isinstance(sfile, bpy.types.SpaceFileBrowser):
+        return
+    if not sfile.active_operator:
+        return
+    if sfile.active_operator.bl_idname != "EXPORT_SCENE_OT_gltf":
+        return
+
+    sfile.params.filename = ensure_filepath_matches_export_format(
+        sfile.params.filename,
+        self.export_format,
+    )
+
 
 class ExportExtendedGLTF2_Base:
     # TODO: refactor to avoid boilerplate
@@ -147,6 +186,15 @@ class ExportExtendedGLTF2_Base:
         default='',
     )
 
+    export_keep_originals: BoolProperty(
+        name='Keep original',
+        description=('Keep original textures files if possible. '
+                     'WARNING: if you use more than one texture, '
+                     'where pbr standard requires only one, only one texture will be used. '
+                     'This can lead to unexpected results'
+        ),
+        default=False,
+    )
     #############################################
     #Special functionalities for batch export:
     export_lods: BoolProperty(
@@ -225,6 +273,14 @@ class ExportExtendedGLTF2_Base:
         max=30
     )
 
+    export_draco_color_quantization: IntProperty(
+        name='Color quantization bits',
+        description='Quantization bits for color values (0 = no quantization)',
+        default=10,
+        min=0,
+        max=30
+    )
+
     export_draco_generic_quantization: IntProperty(
         name='Generic quantization bits',
         description='Quantization bits for generic coordinate values like weights or joints (0 = no quantization)',
@@ -249,6 +305,22 @@ class ExportExtendedGLTF2_Base:
         name='Vertex Colors',
         description='Export vertex colors with meshes',
         default=True
+    )
+
+    use_mesh_edges: BoolProperty(
+        name='Loose Edges',
+        description=(
+            'Export loose edges as lines, using the material from the first material slot'
+        ),
+        default=False,
+    )
+
+    use_mesh_vertices: BoolProperty(
+        name='Loose Points',
+        description=(
+            'Export loose points as glTF points, using the material from the first material slot'
+        ),
+        default=False,
     )
 
     export_cameras: BoolProperty(
@@ -407,6 +479,17 @@ class ExportExtendedGLTF2_Base:
     # Custom scene property for saving settings
     scene_key = "glTF2ExportSettings"
 
+    #
+
+    def check(self, _context):
+        # Ensure file extension matches format
+        old_filepath = self.filepath
+        self.filepath = ensure_filepath_matches_export_format(
+            self.filepath,
+            self.export_format,
+        )
+        return self.filepath != old_filepath
+
     def invoke(self, context, event):
         settings = context.scene.get(self.scene_key)
         self.will_save_settings = False
@@ -435,7 +518,7 @@ class ExportExtendedGLTF2_Base:
             except Exception:
                 pass
 
-        self.has_active_extenions = len(extension_panel_unregister_functors) > 0
+        self.has_active_extensions = len(extension_panel_unregister_functors) > 0
         return ExportHelper.invoke(self, context, event)
 
     def save_settings(self, context):
@@ -482,6 +565,7 @@ class ExportExtendedGLTF2_Base:
             export_settings['gltf_filedirectory'],
             self.export_texture_dir,
         )
+        export_settings['gltf_keep_original_textures'] = self.export_keep_originals
 
         #############################################
         # Special MSFS functionality:
@@ -497,6 +581,8 @@ class ExportExtendedGLTF2_Base:
         export_settings['gltf_texcoords'] = self.export_texcoords
         export_settings['gltf_normals'] = self.export_normals
         export_settings['gltf_tangents'] = self.export_tangents and self.export_normals
+        export_settings['gltf_loose_edges'] = self.use_mesh_edges
+        export_settings['gltf_loose_points'] = self.use_mesh_vertices
 
         if self.is_draco_available:
             export_settings['gltf_draco_mesh_compression'] = self.export_draco_mesh_compression_enable
@@ -504,6 +590,7 @@ class ExportExtendedGLTF2_Base:
             export_settings['gltf_draco_position_quantization'] = self.export_draco_position_quantization
             export_settings['gltf_draco_normal_quantization'] = self.export_draco_normal_quantization
             export_settings['gltf_draco_texcoord_quantization'] = self.export_draco_texcoord_quantization
+            export_settings['gltf_draco_color_quantization'] = self.export_draco_color_quantization
             export_settings['gltf_draco_generic_quantization'] = self.export_draco_generic_quantization
         else:
             export_settings['gltf_draco_mesh_compression'] = False
@@ -519,12 +606,11 @@ class ExportExtendedGLTF2_Base:
         else:
             export_settings['gltf_selected'] = self.use_selection
 
-        # export_settings['gltf_selected'] = self.use_selection This can be uncomment when removing compatibility of export_selected
-
         export_settings['gltf_visible'] = self.use_visible
         export_settings['gltf_renderable'] = self.use_renderable
         export_settings['gltf_active_collection'] = self.use_active_collection
 
+        # export_settings['gltf_selected'] = self.use_selection This can be uncomment when removing compatibility of export_selected
         export_settings['gltf_layers'] = True  # self.export_layers
         export_settings['gltf_extras'] = self.export_extras
         export_settings['gltf_yup'] = self.export_yup
@@ -564,8 +650,9 @@ class ExportExtendedGLTF2_Base:
         export_settings['gltf_displacement'] = self.export_displacement
 
         export_settings['gltf_binary'] = bytearray()
-        export_settings['gltf_binaryfilename'] = os.path.splitext(os.path.basename(
-            bpy.path.ensure_ext(self.filepath,self.filename_ext)))[0] + '.bin'
+        export_settings['gltf_binaryfilename'] = (
+            os.path.splitext(os.path.basename(self.filepath))[0] + '.bin'
+        )
 
         user_extensions = []
         pre_export_callbacks = []
@@ -752,6 +839,11 @@ class GLTF_PT_export_geometry_ext_gltf(bpy.types.Panel):
         col.active = operator.export_normals
         col.prop(operator, 'export_tangents')
         layout.prop(operator, 'export_colors')
+
+        col = layout.column()
+        col.prop(operator, 'use_mesh_edges')
+        col.prop(operator, 'use_mesh_vertices')
+
         layout.prop(operator, 'export_materials')
         col = layout.column()
         col.active = operator.export_materials
@@ -795,7 +887,8 @@ class GLTF_PT_export_geometry_compression_ext_gltf(bpy.types.Panel):
         col = layout.column(align=True)
         col.prop(operator, 'export_draco_position_quantization', text="Quantize Position")
         col.prop(operator, 'export_draco_normal_quantization', text="Normal")
-        col.prop(operator, 'export_draco_texcoord_quantization', text="Tex Coords")
+        col.prop(operator, 'export_draco_texcoord_quantization', text="Tex Coord")
+        col.prop(operator, 'export_draco_color_quantization', text="Color")
         col.prop(operator, 'export_draco_generic_quantization', text="Generic")
 
 
@@ -963,6 +1056,155 @@ def menu_func_export(self, context):
     self.layout.operator(ExportExtendedGLTF2.bl_idname, text='extended glTF 2.0 (.glb/.gltf) for MSFS')
 
 
+class ImportGLTF2(Operator, ImportHelper):
+    """Load a glTF 2.0 file"""
+    bl_idname = 'import_scene.gltf'
+    bl_label = 'Import glTF 2.0'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    filter_glob: StringProperty(default="*.glb;*.gltf", options={'HIDDEN'})
+
+    files: CollectionProperty(
+        name="File Path",
+        type=bpy.types.OperatorFileListElement,
+    )
+
+    loglevel: IntProperty(
+        name='Log Level',
+        description="Log Level")
+
+    import_pack_images: BoolProperty(
+        name='Pack Images',
+        description='Pack all images into .blend file',
+        default=True
+    )
+
+    merge_vertices: BoolProperty(
+        name='Merge Vertices',
+        description=(
+            'The glTF format requires discontinuous normals, UVs, and '
+            'other vertex attributes to be stored as separate vertices, '
+            'as required for rendering on typical graphics hardware. '
+            'This option attempts to combine co-located vertices where possible. '
+            'Currently cannot combine verts with different normals'
+        ),
+        default=False,
+    )
+
+    import_shading: EnumProperty(
+        name="Shading",
+        items=(("NORMALS", "Use Normal Data", ""),
+               ("FLAT", "Flat Shading", ""),
+               ("SMOOTH", "Smooth Shading", "")),
+        description="How normals are computed during import",
+        default="NORMALS")
+
+    bone_heuristic: EnumProperty(
+        name="Bone Dir",
+        items=(
+            ("BLENDER", "Blender (best for re-importing)",
+                "Good for re-importing glTFs exported from Blender. "
+                "Bone tips are placed on their local +Y axis (in glTF space)"),
+            ("TEMPERANCE", "Temperance (average)",
+                "Decent all-around strategy. "
+                "A bone with one child has its tip placed on the local axis "
+                "closest to its child"),
+            ("FORTUNE", "Fortune (may look better, less accurate)",
+                "Might look better than Temperance, but also might have errors. "
+                "A bone with one child has its tip placed at its child's root. "
+                "Non-uniform scalings may get messed up though, so beware"),
+        ),
+        description="Heuristic for placing bones. Tries to make bones pretty",
+        default="TEMPERANCE",
+    )
+
+    guess_original_bind_pose: BoolProperty(
+        name='Guess Original Bind Pose',
+        description=(
+            'Try to guess the original bind pose for skinned meshes from '
+            'the inverse bind matrices. '
+            'When off, use default/rest pose as bind pose'
+        ),
+        default=True,
+    )
+
+    def draw(self, context):
+        layout = self.layout
+
+        layout.use_property_split = True
+        layout.use_property_decorate = False  # No animation.
+
+        layout.prop(self, 'import_pack_images')
+        layout.prop(self, 'merge_vertices')
+        layout.prop(self, 'import_shading')
+        layout.prop(self, 'guess_original_bind_pose')
+        layout.prop(self, 'bone_heuristic')
+
+    def execute(self, context):
+        return self.import_gltf2(context)
+
+    def import_gltf2(self, context):
+        import os
+
+        self.set_debug_log()
+        import_settings = self.as_keywords()
+
+        if self.files:
+            # Multiple file import
+            ret = {'CANCELLED'}
+            dirname = os.path.dirname(self.filepath)
+            for file in self.files:
+                path = os.path.join(dirname, file.name)
+                if self.unit_import(path, import_settings) == {'FINISHED'}:
+                    ret = {'FINISHED'}
+            return ret
+        else:
+            # Single file import
+            return self.unit_import(self.filepath, import_settings)
+
+    def unit_import(self, filename, import_settings):
+        import time
+        from .io.imp.gltf2_io_gltf import glTFImporter, ImportError
+        from .blender.imp.gltf2_blender_gltf import BlenderGlTF
+
+        try:
+            gltf_importer = glTFImporter(filename, import_settings)
+            gltf_importer.read()
+            gltf_importer.checks()
+
+            print("Data are loaded, start creating Blender stuff")
+
+            start_time = time.time()
+            BlenderGlTF.create(gltf_importer)
+            elapsed_s = "{:.2f}s".format(time.time() - start_time)
+            print("glTF import finished in " + elapsed_s)
+
+            gltf_importer.log.removeHandler(gltf_importer.log_handler)
+
+            return {'FINISHED'}
+
+        except ImportError as e:
+            self.report({'ERROR'}, e.args[0])
+            return {'CANCELLED'}
+
+    def set_debug_log(self):
+        import logging
+        if bpy.app.debug_value == 0:
+            self.loglevel = logging.CRITICAL
+        elif bpy.app.debug_value == 1:
+            self.loglevel = logging.ERROR
+        elif bpy.app.debug_value == 2:
+            self.loglevel = logging.WARNING
+        elif bpy.app.debug_value == 3:
+            self.loglevel = logging.INFO
+        else:
+            self.loglevel = logging.NOTSET
+
+
+def menu_func_import(self, context):
+    self.layout.operator(ImportGLTF2.bl_idname, text='glTF 2.0 (.glb/.gltf)')
+
+
 classes = (
     ExportExtendedGLTF2,
     GLTF_PT_export_main_ext_gltf,
@@ -989,6 +1231,7 @@ def register():
 
     # add to the export / import menu
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export)
+#    bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
 
 
 def unregister():
@@ -1002,3 +1245,4 @@ def unregister():
 
     # remove from the export / import menu
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_export)
+#    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)

@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The glTF-Blender-IO authors.
+# Copyright 2018-2021 The glTF-Blender-IO authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ def gather_animation_sampler(channels: typing.Tuple[bpy.types.FCurve],
                              bake_range_end,
                              action_name: str,
                              driver_obj,
+                             node_channel_is_animated: bool,
                              export_settings
                              ) -> gltf2_io.AnimationSampler:
 
@@ -56,15 +57,25 @@ def gather_animation_sampler(channels: typing.Tuple[bpy.types.FCurve],
                                                  bake_channel,
                                                  driver_obj,
                                                  export_settings)
+    if blender_object.parent is not None:
+        matrix_parent_inverse = blender_object.matrix_parent_inverse.copy().freeze()
+    else:
+        matrix_parent_inverse = mathutils.Matrix.Identity(4).freeze()
 
+    input = __gather_input(channels, blender_object_if_armature, non_keyed_values,
+                         bake_bone, bake_channel, bake_range_start, bake_range_end, action_name, driver_obj, node_channel_is_animated, export_settings)
+
+    if input is None:
+        # After check, no need to animate this node for this channel
+        return None
 
     sampler = gltf2_io.AnimationSampler(
         extensions=__gather_extensions(channels, blender_object_if_armature, export_settings, bake_bone, bake_channel),
         extras=__gather_extras(channels, blender_object_if_armature, export_settings, bake_bone, bake_channel),
-        input=__gather_input(channels, blender_object_if_armature, non_keyed_values,
-                             bake_bone, bake_channel, bake_range_start, bake_range_end, action_name, driver_obj, export_settings),
+        input=input,
         interpolation=__gather_interpolation(channels, blender_object_if_armature, export_settings, bake_bone, bake_channel),
-        output=__gather_output(channels, blender_object.matrix_parent_inverse.copy().freeze(),
+        output=__gather_output(channels,
+                               matrix_parent_inverse,
                                blender_object_if_armature,
                                non_keyed_values,
                                bake_bone,
@@ -73,6 +84,7 @@ def gather_animation_sampler(channels: typing.Tuple[bpy.types.FCurve],
                                bake_range_end,
                                action_name,
                                driver_obj,
+                               node_channel_is_animated,
                                export_settings)
     )
 
@@ -225,6 +237,7 @@ def __gather_input(channels: typing.Tuple[bpy.types.FCurve],
                    bake_range_end,
                    action_name,
                    driver_obj,
+                   node_channel_is_animated: bool,
                    export_settings
                    ) -> gltf2_io.Accessor:
     """Gather the key time codes."""
@@ -237,7 +250,11 @@ def __gather_input(channels: typing.Tuple[bpy.types.FCurve],
                                                                                   bake_range_end,
                                                                                   action_name,
                                                                                   driver_obj,
+                                                                                  node_channel_is_animated,
                                                                                   export_settings)
+    if keyframes is None:
+        # After check, no need to animation this node
+        return None
     times = [k.seconds for k in keyframes]
 
     return gltf2_blender_gather_accessors.gather_accessor(
@@ -302,6 +319,7 @@ def __gather_output(channels: typing.Tuple[bpy.types.FCurve],
                     bake_range_end,
                     action_name,
                     driver_obj,
+                    node_channel_is_animated: bool,
                     export_settings
                     ) -> gltf2_io.Accessor:
     """Gather the data of the keyframes."""
@@ -314,6 +332,7 @@ def __gather_output(channels: typing.Tuple[bpy.types.FCurve],
                                                                                   bake_range_end,
                                                                                   action_name,
                                                                                   driver_obj,
+                                                                                  node_channel_is_animated,
                                                                                   export_settings)
     if bake_bone is not None:
         target_datapath = "pose.bones['" + bake_bone + "']." + bake_channel
@@ -327,7 +346,12 @@ def __gather_output(channels: typing.Tuple[bpy.types.FCurve],
         object_path = get_target_object_path(target_datapath)
     else:
         object_path = None
-    is_armature_animation = bake_bone is not None or (blender_object_if_armature is not None and object_path != "")
+
+    # If driver_obj is set, this is a shapekey animation
+    if driver_obj is not None:
+        is_armature_animation = False
+    else:
+        is_armature_animation = bake_bone is not None or (blender_object_if_armature is not None and object_path != "")
 
     if is_armature_animation:
         if bake_bone is None:
@@ -343,10 +367,12 @@ def __gather_output(channels: typing.Tuple[bpy.types.FCurve],
                          (0.0, 0.0, 1.0, 0.0),
                          (0.0, -1.0, 0.0, 0.0),
                          (0.0, 0.0, 0.0, 1.0)))
-                correction_matrix_local = gltf2_blender_math.multiply(axis_basis_change, bone.bone.matrix_local)
+                correction_matrix_local = axis_basis_change @ bone.bone.matrix_local
             else:
-                correction_matrix_local = gltf2_blender_math.multiply(
-                    bone.parent.bone.matrix_local.inverted(), bone.bone.matrix_local)
+                correction_matrix_local = (
+                    bone.parent.bone.matrix_local.inverted_safe() @
+                    bone.bone.matrix_local
+                )
 
             transform = correction_matrix_local
         else:

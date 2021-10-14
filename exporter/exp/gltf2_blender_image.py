@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The glTF-Blender-IO authors.
+# Copyright 2018-2021 The glTF-Blender-IO authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,8 +64,11 @@ class ExportImage:
     intelligent decisions about how to encode the image.
     """
 
-    def __init__(self):
+    def __init__(self, original=None):
         self.fills = {}
+
+        # In case of keeping original texture images
+        self.original = original
 
     @staticmethod
     def from_blender_image(image: bpy.types.Image):
@@ -73,6 +76,10 @@ class ExportImage:
         for chan in range(image.channels):
             export_image.fill_image(image, dst_chan=chan, src_chan=chan)
         return export_image
+
+    @staticmethod
+    def from_original(image: bpy.types.Image):
+        return ExportImage(image)
 
     def fill_image(self, image: bpy.types.Image, dst_chan: Channel, src_chan: Channel):
         self.fills[dst_chan] = FillImage(image, src_chan)
@@ -84,7 +91,10 @@ class ExportImage:
         return chan in self.fills
 
     def empty(self) -> bool:
-        return not self.fills
+        if self.original is None:
+            return not self.fills
+        else:
+            return False
 
     def blender_image(self) -> Optional[bpy.types.Image]:
         """If there's an existing Blender image we can use,
@@ -123,60 +133,58 @@ class ExportImage:
     def __encode_unhappy(self) -> bytes:
         # We need to assemble the image out of channels.
         # Do it with numpy and image.pixels.
-        result = None
 
-        img_fills = {
-            chan: fill
-            for chan, fill in self.fills.items()
-            if isinstance(fill, FillImage)
-        }
-        # Loop over images instead of dst_chans; ensures we only decode each
-        # image once even if it's used in multiple channels.
-        image_names = list(set(fill.image.name for fill in img_fills.values()))
-        for image_name in image_names:
-            image = bpy.data.images[image_name]
+        # Find all Blender images used
+        images = []
+        for fill in self.fills.values():
+            if isinstance(fill, FillImage):
+                if fill.image not in images:
+                    images.append(fill.image)
 
-            if result is None:
-                dim = (image.size[0], image.size[1])
-                result = np.ones(dim[0] * dim[1] * 4, np.float32)
-                tmp_buf = np.empty(dim[0] * dim[1] * 4, np.float32)
-            # Images should all be the same size (should be guaranteed by
-            # gather_texture_info).
-            assert (image.size[0], image.size[1]) == dim
+        if not images:
+            # No ImageFills; use a 1x1 white pixel
+            pixels = np.array([1.0, 1.0, 1.0, 1.0], np.float32)
+            return self.__encode_from_numpy_array(pixels, (1, 1))
 
-            image.pixels.foreach_get(tmp_buf)
+        width = max(image.size[0] for image in images)
+        height = max(image.size[1] for image in images)
 
-            for dst_chan, img_fill in img_fills.items():
-                if img_fill.image == image:
-                    result[int(dst_chan)::4] = tmp_buf[int(img_fill.src_chan)::4]
+        out_buf = np.ones(width * height * 4, np.float32)
+        tmp_buf = np.empty(width * height * 4, np.float32)
+
+        for image in images:
+            if image.size[0] == width and image.size[1] == height:
+                image.pixels.foreach_get(tmp_buf)
+            else:
+                # Image is the wrong size; make a temp copy and scale it.
+                with TmpImageGuard() as guard:
+                    _make_temp_image_copy(guard, src_image=image)
+                    tmp_image = guard.image
+                    tmp_image.scale(width, height)
+                    tmp_image.pixels.foreach_get(tmp_buf)
+
+            # Copy any channels for this image to the output
+            for dst_chan, fill in self.fills.items():
+                if isinstance(fill, FillImage) and fill.image == image:
+                    out_buf[int(dst_chan)::4] = tmp_buf[int(fill.src_chan)::4]
 
         tmp_buf = None  # GC this
 
-        if result is None:
-            # No ImageFills; use a 1x1 white pixel
-            dim = (1, 1)
-            result = np.array([1.0, 1.0, 1.0, 1.0])
-
-        return self.__encode_from_numpy_array(result, dim)
+        return self.__encode_from_numpy_array(out_buf, (width, height))
 
     def __encode_from_numpy_array(self, pixels: np.ndarray, dim: Tuple[int, int]) -> bytes:
-        tmp_image = None
-        try:
-            tmp_image = bpy.data.images.new(
+        with TmpImageGuard() as guard:
+            guard.image = bpy.data.images.new(
                 "##gltf-export:tmp-image##",
                 width=dim[0],
                 height=dim[1],
                 alpha=Channel.A in self.fills,
             )
-            assert tmp_image.channels == 4  # 4 regardless of the alpha argument above.
+            tmp_image = guard.image
 
             tmp_image.pixels.foreach_set(pixels)
 
             return _encode_temp_image(tmp_image, self.file_format)
-
-        finally:
-            if tmp_image is not None:
-                bpy.data.images.remove(tmp_image, do_unlink=True)
 
     def __encode_from_image(self, image: bpy.types.Image) -> bytes:
         # See if there is an existing file we can use.
@@ -200,22 +208,10 @@ class ExportImage:
                     return data
 
         # Copy to a temp image and save.
-        tmp_image = None
-        try:
-            tmp_image = image.copy()
-            tmp_image.update()
-
-            if image.is_dirty:
-                # Copy the pixels to get the changes
-                tmp_buf = np.empty(image.size[0] * image.size[1] * 4, np.float32)
-                image.pixels.foreach_get(tmp_buf)
-                tmp_image.pixels.foreach_set(tmp_buf)
-                tmp_buf = None  # GC this
-
+        with TmpImageGuard() as guard:
+            _make_temp_image_copy(guard, src_image=image)
+            tmp_image = guard.image
             return _encode_temp_image(tmp_image, self.file_format)
-        finally:
-            if tmp_image is not None:
-                bpy.data.images.remove(tmp_image, do_unlink=True)
 
 
 def _encode_temp_image(tmp_image: bpy.types.Image, file_format: str) -> bytes:
@@ -229,3 +225,30 @@ def _encode_temp_image(tmp_image: bpy.types.Image, file_format: str) -> bytes:
 
         with open(tmpfilename, "rb") as f:
             return f.read()
+
+
+class TmpImageGuard:
+    """Guard to automatically clean up temp images (use it with `with`)."""
+    def __init__(self):
+        self.image = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if self.image is not None:
+            bpy.data.images.remove(self.image, do_unlink=True)
+
+
+def _make_temp_image_copy(guard: TmpImageGuard, src_image: bpy.types.Image):
+    """Makes a temporary copy of src_image. Will be cleaned up with guard."""
+    guard.image = src_image.copy()
+    tmp_image = guard.image
+
+    tmp_image.update()
+
+    if src_image.is_dirty:
+        # Unsaved changes aren't copied by .copy(), so do them ourselves
+        tmp_buf = np.empty(src_image.size[0] * src_image.size[1] * 4, np.float32)
+        src_image.pixels.foreach_get(tmp_buf)
+        tmp_image.pixels.foreach_set(tmp_buf)

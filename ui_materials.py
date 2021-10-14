@@ -1,6 +1,6 @@
 ###################################################################################################
 #
-# Copyright 2020 Otmar Nitsche
+# Copyright 2020 Otmar Nitsche 2021 Ron Haertel
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -60,6 +60,13 @@ class MSFS_PT_material(bpy.types.Panel):
                 box.label(text="Glass parameters:",icon='SHADING_RENDERED')
                 box.prop(mat, 'msfs_glass_reflection_mask_factor')
                 box.prop(mat, 'msfs_glass_deformation_factor')
+
+            if mat.msfs_show_windshield_options == True:
+                box = layout.box()
+                box.label(text="Windshield Options", icon="MATFLUID")
+                box.prop(mat, "msfs_rain_drop_scale")
+                box.prop(mat, "msfs_wiper_1_state")
+                box.prop(mat, "msfs_wiper_2_state")
 
             if mat.msfs_show_decal_parameters == True:
                 box = layout.box()
@@ -199,6 +206,14 @@ class MSFS_PT_material(bpy.types.Panel):
                 if mat.msfs_show_blend_threshold == True:
                     box.prop(mat, 'msfs_blend_threshold')
 
+            if mat.msfs_show_pearl == True:
+                box = layout.box()
+                box.label(text="Pearlescent Options", icon="NODE_MATERIAL")
+                box.prop(mat, "msfs_use_pearl_effect")
+                box.prop(mat, "msfs_pearl_shift")
+                box.prop(mat, "msfs_pearl_range")
+                box.prop(mat, "msfs_pearl_brightness")
+
             if (mat.msfs_show_collision_material == True or mat.msfs_show_road_material == True):
                 box= layout.box()
                 box.label(text="Gameplay parameters", icon='GHOST_ENABLED')
@@ -212,6 +227,11 @@ class MSFS_PT_material(bpy.types.Panel):
                 box.label(text="UV options", icon='UV')
                 #if mat.msfs_show_ao_use_uv2 == True:   - removed by Asobo
                 #    box.prop(mat, 'msfs_ao_use_uv2')
+                box.prop(mat, "msfs_uv_offset_u")
+                box.prop(mat, "msfs_uv_offset_v")
+                box.prop(mat, "msfs_uv_tiling_u")
+                box.prop(mat, "msfs_uv_tiling_v")
+                box.prop(mat, "msfs_uv_rotation")
                 if mat.msfs_show_uv_clamp == True:
                     subbox = box.box()
                     row=subbox.row()

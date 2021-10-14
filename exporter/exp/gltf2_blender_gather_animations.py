@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The glTF-Blender-IO authors.
+# Copyright 2018-2021 The glTF-Blender-IO authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -105,8 +105,6 @@ def __gather_animation(blender_action: bpy.types.Action,
                        blender_object: bpy.types.Object,
                        export_settings
                        ) -> typing.Optional[gltf2_io.Animation]:
-    import re
-
     if not __filter_animation(blender_action, blender_object, export_settings):
         return None
 
@@ -124,11 +122,11 @@ def __gather_animation(blender_action: bpy.types.Action,
         print_console("WARNING", "Animation '{}' could not be exported. Cause: {}".format(name, error))
         return None
 
-    # To allow reuse of samplers in one animation,
-    __link_samplers(animation, export_settings)
-
     if not animation.channels:
         return None
+
+    # To allow reuse of samplers in one animation,
+    __link_samplers(animation, export_settings)
 
     export_user_extensions('gather_animation_hook', export_settings, animation, blender_action, blender_object)
 

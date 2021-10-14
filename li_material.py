@@ -1204,7 +1204,7 @@ class MSFS_LI_material():
 
     Material.msfs_show_alpha_cutoff = bpy.props.BoolProperty(name="show_alpha_cutoff",default=False)
     Material.msfs_show_blend_threshold = bpy.props.BoolProperty(name="show_blend_threshold",default=False)
-
+    Material.msfs_show_pearl = bpy.props.BoolProperty(name="show_pearl",default=False)
 
     # MSFS Material properties
     # The following variables are written into the glTF file when exporting.
@@ -1280,7 +1280,7 @@ class MSFS_LI_material():
     Material.msfs_parallax_scale = bpy.props.FloatProperty(name="Scale", min=0.0,max=1.0,default=0.0)
     Material.msfs_parallax_room_size_x = bpy.props.FloatProperty(name="X", min=0.0,default=0.5)
     Material.msfs_parallax_room_size_y = bpy.props.FloatProperty(name="Y", min=0.0,default=0.5)
-    Material.msfs_parallax_room_number = bpy.props.FloatProperty(name="number XY", min=0.0,default=1.0)
+    Material.msfs_parallax_room_number = bpy.props.FloatProperty(name="Rm number XY", min=0.0,default=1.0)
     Material.msfs_parallax_corridor = bpy.props.BoolProperty(name="Corridor", default=False)
 
     #Geo Decal Frosted parameters:

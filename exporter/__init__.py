@@ -294,12 +294,23 @@ class ExportExtendedGLTF2_Base:
         description='Export vertex tangents with meshes',
         default=False
     )
-
-    export_materials: BoolProperty(
+    export_materials: EnumProperty(
         name='Materials',
-        description='Export materials',
-        default=True
+        items=(('EXPORT', 'Export',
+        'Export all materials used by included objects'),
+        ('PLACEHOLDER', 'Placeholder',
+        'Do not export materials, but write multiple primitive groups per mesh, keeping material slot information'),
+        ('NONE', 'No export',
+        'Do not export materials, and combine mesh primitive groups, losing material slot information')),
+        description='Export materials ',
+        default='EXPORT'
     )
+
+    #export_materials: BoolProperty(
+    #    name='Materials',
+    #    description='Export materials',
+    #    default=True
+    #)
 
     export_colors: BoolProperty(
         name='Vertex Colors',
@@ -846,7 +857,7 @@ class GLTF_PT_export_geometry_ext_gltf(bpy.types.Panel):
 
         layout.prop(operator, 'export_materials')
         col = layout.column()
-        col.active = operator.export_materials
+        col.active = operator.export_materials == "EXPORT"
         col.prop(operator, 'export_image_format')
 
 
@@ -1034,7 +1045,7 @@ class GLTF_PT_export_user_extensions(bpy.types.Panel):
         sfile = context.space_data
         operator = sfile.active_operator
 
-        return operator.bl_idname == "EXPORT_SCENE_OT_ext_gltf" and operator.has_active_extenions
+        return operator.bl_idname == "EXPORT_SCENE_OT_ext_gltf" and operator.has_active_extensions
 
     def draw(self, context):
         layout = self.layout

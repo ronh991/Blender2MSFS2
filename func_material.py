@@ -766,7 +766,7 @@ def CreateMSFSInvisibleShader(Material):
     bsdf_node.inputs["Base Color"].default_value = (0.8,0.0,0.0,1.0)
     bsdf_node.inputs["Emission"].default_value = (0.8,0.0,0.0,1.0)
 
-    bsdf_node.inputs["Subsurface"].default_value = 0.0    
+    bsdf_node.inputs["Subsurface"].default_value = 0.0
 
     #connect the nodes:
     links.new(output_node.inputs["Surface"], bsdf_node.outputs["BSDF"])

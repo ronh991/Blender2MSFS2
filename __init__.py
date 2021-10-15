@@ -17,7 +17,7 @@
 ###################################################################################################
 
 bl_info = {
-    "name" : "MSFSToolkit",
+    "name" : "MSFSToolkit v 0.42.x",
     "author" : "Otmar Nitsche",
     "description" : "This toolkit prepares your 3D assets to be used for Microsoft Flight Simulator. Copyright (c) 2020 Otmar Nitsche, 2021 Ron Haertel",
     "blender" : (3, 00, 0),

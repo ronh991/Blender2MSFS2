@@ -28,7 +28,7 @@ import bpy
 
 bl_info = {
     'name': 'glTF 2.0 extended format',
-    'author': 'Julien Duroure, Scurest, Norbert Nopper, Urs Hanselmann, Moritz Becher, Benjamin Schmithüsen, Jim Eckerlein, and many external contributors. Modified by Otmar Nitsche for use with the Blender2MSFS addon.',
+    'author': 'Ron Haertel, Julien Duroure, Scurest, Norbert Nopper, Urs Hanselmann, Moritz Becher, Benjamin Schmithüsen, Jim Eckerlein, and many external contributors. Modified by Otmar Nitsche for use with the Blender2MSFS addon.',
     "version": (1, 7, 30),
     'blender': (2, 91, 0),
     'location': 'File > Export',
@@ -1064,7 +1064,7 @@ class ExportExtendedGLTF2(bpy.types.Operator, ExportExtendedGLTF2_Base, ExportHe
 
 
 def menu_func_export(self, context):
-    self.layout.operator(ExportExtendedGLTF2.bl_idname, text='extended glTF 2.0 (.glb/.gltf) for MSFS')
+    self.layout.operator(ExportExtendedGLTF2.bl_idname, text='extended glTF 2.0 (.glb/.gltf) for MSFS (v0.42.x)')
 
 
 class ImportGLTF2(Operator, ImportHelper):
@@ -1213,7 +1213,7 @@ class ImportGLTF2(Operator, ImportHelper):
 
 
 def menu_func_import(self, context):
-    self.layout.operator(ImportGLTF2.bl_idname, text='glTF 2.0 (.glb/.gltf)')
+    self.layout.operator(ImportGLTF2.bl_idname, text='glTF 2.0 (.glb/.gltf) (MSFS v0.42.x)')
 
 
 classes = (

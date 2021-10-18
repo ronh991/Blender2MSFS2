@@ -503,7 +503,18 @@ class MSFS_LI_material():
             mat.msfs_show_pearl = False
             mat.msfs_show_windshield_options = True
 
-            switch_msfs_blendmode()
+            #mat.msfs_roughness_scale = 0.0
+            #mat.msfs_metallic_scale = 0.0
+            
+            #switch_msfs_blendmode()
+            if mat.msfs_blend_mode == 'BLEND':
+                MakeTranslucent(mat)
+            elif mat.msfs_blend_mode == 'MASKED':
+                MakeMasked(mat)
+            elif mat.msfs_blend_mode == 'DITHER':
+                MakeDither(mat)
+            else:
+                MakeOpaque(mat)
             
             print("Switched to msfs_windshield material.")
 
@@ -1198,6 +1209,36 @@ class MSFS_LI_material():
 
     Material.msfs_show_collision_material = bpy.props.BoolProperty(name="show_collision_material",default=False)
     Material.msfs_show_road_material = bpy.props.BoolProperty(name="show_road_material",default=False)
+    Material.msfs_uv_offset_u = FloatProperty(
+        name="U",
+        default=0.0,
+        min=-10.0,
+        max=10.0,
+    )
+    Material.msfs_uv_offset_v = FloatProperty(
+        name="V",
+        default=0.0,
+        min=-10.0,
+        max=10.0,
+    )
+    Material.msfs_uv_tiling_u = FloatProperty(
+        name="U",
+        default=1.0,
+        min=-10.0,
+        max=10.0,
+    )
+    Material.msfs_uv_tiling_v = FloatProperty(
+        name="V",
+        default=1.0,
+        min=-10.0,
+        max=10.0,
+    )
+    Material.msfs_uv_rotation = FloatProperty(
+        name="UV Rotation",
+        default=0.0,
+        min=-360.0,
+        max=360.0,
+    )
 
     Material.msfs_show_ao_use_uv2 = bpy.props.BoolProperty(name="show_ao_use_uv2",default=False)
     Material.msfs_show_uv_clamp = bpy.props.BoolProperty(name="show_uv_clamp",default=False)

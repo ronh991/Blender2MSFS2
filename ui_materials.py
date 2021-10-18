@@ -234,7 +234,7 @@ class MSFS_PT_material(bpy.types.Panel):
                 row.prop(mat,'msfs_uv_offset_v')
                 subbox = box.box()
                 row=subbox.row()
-                row.label(text="UV t")
+                row.label(text="UV tiling")
                 row.prop(mat,'msfs_uv_tiling_u')
                 row.prop(mat,'msfs_uv_tiling_v')
                 box.prop(mat, "msfs_uv_rotation")

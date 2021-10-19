@@ -113,7 +113,7 @@ class MSFS_PT_material(bpy.types.Panel):
 
             if (mat.msfs_show_albedo == True or mat.msfs_show_metallic == True or mat.msfs_show_normal == True or mat.msfs_show_emissive == True or mat.msfs_show_detail_albedo == True or 
                 mat.msfs_show_detail_metallic == True or mat.msfs_show_detail_normal == True or mat.msfs_show_blend_mask == True or mat.msfs_show_anisotropic_direction == True or
-                mat.msfs_show_clearcoat == True or mat.msfs_show_behind_glass == True):
+                mat.msfs_show_clearcoat == True or mat.msfs_show_behind_glass == True or mat.msfs_show_wiper_mask == True):
 
                 box = layout.box()
                 box.label(text="Texture maps",icon='TEXTURE')
@@ -237,7 +237,7 @@ class MSFS_PT_material(bpy.types.Panel):
                 row.label(text="UV tiling")
                 row.prop(mat,'msfs_uv_tiling_u')
                 row.prop(mat,'msfs_uv_tiling_v')
-                box.prop(mat, "msfs_uv_rotation")
+                box.prop(mat, 'msfs_uv_rotation')
                 if mat.msfs_show_uv_clamp == True:
                     subbox = box.box()
                     row=subbox.row()

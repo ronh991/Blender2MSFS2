@@ -4,7 +4,7 @@ Collaborative adoption of Blender2MSFS which apparently has been left in limbo b
 Ron Haertel - 0.42.0 author (super experimental - DO NOT USE FOR PRODUCTION - ALPHA testing only)
 Ver 0.42.0 - Updated to the latest Khronos version of the blender gltf exporter with the MSFS 2020 specific
 ASOBO gltf extensions
-New - Pearlescnet - not operational yet
+New - Pearlescnet - operationl
 New - added more UV export data - texture tiling - not operational yet.
 New - FBW - importer - not operational
 

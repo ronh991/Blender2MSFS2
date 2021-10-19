@@ -1154,6 +1154,16 @@ class MSFS_LI_material():
             mat.node_tree.nodes["detail_uv_scale"].inputs["Location"].default_value[0] = mat.msfs_detail_uv_offset_x
             mat.node_tree.nodes["detail_uv_scale"].inputs["Location"].default_value[1] = mat.msfs_detail_uv_offset_y
 
+    def update_roughness_scale(self,context):
+        mat=context.active_object.active_material
+        if mat.node_tree.nodes.get("bsdf", None) != None:
+            mat.node_tree.nodes["bsdf"].inputs["Roughness"].default_value = mat.msfs_roughness_scale
+
+    def update_metallic_scale(self,context):
+        mat=context.active_object.active_material
+        if mat.node_tree.nodes.get("bsdf", None) != None:
+            mat.node_tree.nodes["bsdf"].inputs["Metallic"].default_value = mat.msfs_metallic_scale
+
 
     # Main material mode, in accordance with MSFS material shaders:
     Material.msfs_material_mode =  bpy.props.EnumProperty(items=(('NONE',"Disabled",""),
@@ -1209,36 +1219,6 @@ class MSFS_LI_material():
 
     Material.msfs_show_collision_material = bpy.props.BoolProperty(name="show_collision_material",default=False)
     Material.msfs_show_road_material = bpy.props.BoolProperty(name="show_road_material",default=False)
-    Material.msfs_uv_offset_u = FloatProperty(
-        name="U",
-        default=0.0,
-        min=-10.0,
-        max=10.0,
-    )
-    Material.msfs_uv_offset_v = FloatProperty(
-        name="V",
-        default=0.0,
-        min=-10.0,
-        max=10.0,
-    )
-    Material.msfs_uv_tiling_u = FloatProperty(
-        name="U",
-        default=1.0,
-        min=-10.0,
-        max=10.0,
-    )
-    Material.msfs_uv_tiling_v = FloatProperty(
-        name="V",
-        default=1.0,
-        min=-10.0,
-        max=10.0,
-    )
-    Material.msfs_uv_rotation = FloatProperty(
-        name="UV Rotation",
-        default=0.0,
-        min=-360.0,
-        max=360.0,
-    )
 
     Material.msfs_show_ao_use_uv2 = bpy.props.BoolProperty(name="show_ao_use_uv2",default=False)
     Material.msfs_show_uv_clamp = bpy.props.BoolProperty(name="show_uv_clamp",default=False)
@@ -1258,21 +1238,21 @@ class MSFS_LI_material():
     # Windshield
     Material.msfs_rain_drop_scale = FloatProperty(
         name="Rain Drop Scale",
-        default=1.0,
         min=0.0,
         max=100.0,
+        default=1.0
     )
     Material.msfs_wiper_1_state = FloatProperty(
         name="Wiper 1 State",
-        default=0.0,
         min=0.0,
         max=1.0,
+        default=0.0
     )
     Material.msfs_wiper_2_state = FloatProperty(
         name="Wiper 2 State",
-        default=0.0,
         min=0.0,
         max=1.0,
+        default=0.0
     )  # The 3DS Max plugin has up to 4 states, but the last 2 aren't visible
 
     #Glass parameters:
@@ -1284,25 +1264,25 @@ class MSFS_LI_material():
 
     Material.msfs_use_pearl_effect = BoolProperty(
         name="Use Pearl Effect",
-        default=False,
+        default=False
     )
     Material.msfs_pearl_shift = FloatProperty(
         name="Color Shift",
-        default=0.0,
         min=-999.0,
         max=999.0,
+        default=0.0
     )
     Material.msfs_pearl_range = FloatProperty(
         name="Color Range",
-        default=0.0,
         min=-999.0,
         max=999.0,
+        default=0.0
     )
     Material.msfs_pearl_brightness = FloatProperty(
         name="Color Brightness",
-        default=0.0,
         min=-1.0,
         max=1.0,
+        default=0.0
     )
 
     #Decal parameters:
@@ -1368,14 +1348,45 @@ class MSFS_LI_material():
     Material.msfs_road_material = bpy.props.BoolProperty(name="Road material",default=False)
 
     #UV options:
+    
+    Material.msfs_uv_offset_u = FloatProperty(
+        name="U",
+        min=-10.0,
+        max=10.0,
+        default=0.0
+    )
+    Material.msfs_uv_offset_v = FloatProperty(
+        name="V",
+        min=-10.0,
+        max=10.0,
+        default=0.0
+    )
+    Material.msfs_uv_tiling_u = FloatProperty(
+        name="U",
+        min=-10.0,
+        max=10.0,
+        default=1.0
+    )
+    Material.msfs_uv_tiling_v = FloatProperty(
+        name="V",
+        min=-10.0,
+        max=10.0,
+        default=1.0
+    )
+    Material.msfs_uv_rotation = FloatProperty(
+        name="UV Rotation",
+        min=-360.0,
+        max=360.0,
+        default=0.0
+    )
     Material.msfs_ao_use_uv2 = bpy.props.BoolProperty(name="AO use UV2",default=False)
     Material.msfs_uv_clamp_x = bpy.props.BoolProperty(name="X",default=False)
     Material.msfs_uv_clamp_y = bpy.props.BoolProperty(name="Y",default=False)
     Material.msfs_uv_clamp_z = bpy.props.BoolProperty(name="Z",default=False)
 
     #Material parameters
-    Material.msfs_roughness_scale = bpy.props.FloatProperty(name="Roughness scale",min=0,max=1,default=1)
-    Material.msfs_metallic_scale = bpy.props.FloatProperty(name="Metallic scale",min=0,max=1,default=1)
+    Material.msfs_roughness_scale = bpy.props.FloatProperty(name="Roughness scale",min=0,max=1,default=1, update = update_roughness_scale)
+    Material.msfs_metallic_scale = bpy.props.FloatProperty(name="Metallic scale",min=0,max=1,default=1, update = update_metallic_scale)
     Material.msfs_normal_scale = bpy.props.FloatProperty(name="Normal scale",min=0,default=1,update=update_normal_scale)
     Material.msfs_alpha_cutoff = bpy.props.FloatProperty(name="Alpha cutoff",min=0,max=1,default=0.1,update=update_alpha_cutoff)
     Material.msfs_detail_uv_scale = bpy.props.FloatProperty(name="Detail UV scale",min=0,default=1,update=update_detail_uv_scale)

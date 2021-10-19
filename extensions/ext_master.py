@@ -162,6 +162,16 @@ class glTF2ExportUserExtension:
                             required=False
                         )
 
+                if blender_material.msfs_show_pearl == True:
+                    if blender_material.msfs_use_pearl_effect == True:
+                        gltf2_material.extensions["ASOBO_material_pearlescent"] = self.Extension(
+                            name="ASOBO_material_pearlescent",
+                            extension={"pearlShift": blender_material.msfs_pearl_shift,
+                            "pearlRange": blender_material.msfs_pearl_range,
+                            "pearlBrightness": blender_material.msfs_pearl_brightness},
+                            required=False
+                        )
+
                 #-double-sided injected through material settings
                 #-responsive aa missing
 
@@ -189,7 +199,7 @@ class glTF2ExportUserExtension:
                         node = nodes.get("albedo_detail_mix")
                         if node != None:
                             inputs = (node.inputs["Color2"],)
-                        albedo_detail_texture = gather_texture_info(inputs, export_settings)
+                        albedo_detail_texture = gather_texture_info(inputs[0], inputs, export_settings)
                         if albedo_detail_texture != None:
                             detail_extension["detailColorTexture"] = albedo_detail_texture
                     if blender_material.msfs_detail_metallic_texture != None:
@@ -197,7 +207,7 @@ class glTF2ExportUserExtension:
                         node = nodes.get("metallic_detail_mix")
                         if node != None:
                             inputs = (node.inputs["Color2"],)
-                        metallic_detail_texture = gather_texture_info(inputs, export_settings)
+                        metallic_detail_texture = gather_texture_info(inputs[0], inputs, export_settings)
                         if metallic_detail_texture != None:
                             detail_extension["detailMetalRoughAOTexture"] = metallic_detail_texture
                     if blender_material.msfs_detail_normal_texture != None:
@@ -205,7 +215,7 @@ class glTF2ExportUserExtension:
                         node = nodes.get("normal_detail_mix")
                         if node != None:
                             inputs = (node.inputs["Color2"],)
-                        normal_detail_texture = gather_texture_info(inputs, export_settings)
+                        normal_detail_texture = gather_texture_info(inputs[0], inputs, export_settings)
                         if normal_detail_texture != None:
                             detail_extension["detailNormalTexture"] = normal_detail_texture
                     if len(detail_extension) > 0:
@@ -309,7 +319,7 @@ class glTF2ExportUserExtension:
                         node = nodes.get("albedo_detail_mix")
                         if node != None:
                             inputs = (node.inputs["Color2"],)
-                        behind_glass_texture = gather_texture_info(inputs, export_settings)
+                        behind_glass_texture = gather_texture_info(inputs[0], inputs, export_settings)
                         if behind_glass_texture != None:
                             parallax_extension["behindWindowMapTexture"] = behind_glass_texture
 

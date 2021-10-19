@@ -241,7 +241,7 @@ def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
     links.new(normal_detail_mix.outputs["Color"], normal_map_node.inputs["Color"])
     #link to bsdf
     #links.new(normal_map_node.outputs["Normal"], bsdf_node.inputs["Normal"])
-    # Pearlscent required here somewhere
+    # Pearlscent nodes required here somewhere
 
 
 def CreateEmissiveBranch(Material, bsdf_node, offset=(0.0,0.0)):
@@ -297,9 +297,10 @@ def CreateDetailBranch(Material, bsdf_node, offset=(0.0,0.0)):
         if Material.msfs_detail_normal_texture.name != "":
             detail_normal_node.image = Material.msfs_detail_normal_texture
 
+# these seem to create these KHR_texture_transform extensions that are not wanted. - disconnect vector on mapping
     # Create the scaling transform
-    detail_uv_scale_node = CreateNewNode(Material, 'ShaderNodeMapping', 'detail_uv_scale', location=(offset[0]-200,offset[1]-195))
-    detail_uv_scale_node.hide = True
+    #detail_uv_scale_node = CreateNewNode(Material, 'ShaderNodeMapping', 'detail_uv_scale', location=(offset[0]-200,offset[1]-195))
+    #detail_uv_scale_node.hide = True
 
     # Find the main pbr nodes:
     albedo_node_mix = nodes.get("albedo_detail_mix")
@@ -320,14 +321,16 @@ def CreateDetailBranch(Material, bsdf_node, offset=(0.0,0.0)):
             if Material.msfs_detail_normal_texture.name != "":
                 links.new(detail_normal_node.outputs["Color"],normal_node_mix.inputs["Color2"])
 
-    links.new(uv_node.outputs["UV"],detail_uv_scale_node.inputs["Vector"])
-    links.new(detail_uv_scale_node.outputs["Vector"],detail_albedo_node.inputs["Vector"])
-    links.new(detail_uv_scale_node.outputs["Vector"],detail_metallic_node.inputs["Vector"])
-    links.new(detail_uv_scale_node.outputs["Vector"],detail_normal_node.inputs["Vector"])
+# these seem to create these KHR_texture_transform extensions that are not wanted. - disconnect vector on mapping
+    #links.new(uv_node.outputs["UV"],detail_uv_scale_node.inputs["Vector"])
+    #if Material.msfs_material_mode != "msfs_windshield":
+    #    links.new(detail_uv_scale_node.outputs["Vector"],detail_albedo_node.inputs["Vector"])
+    #    links.new(detail_uv_scale_node.outputs["Vector"],detail_metallic_node.inputs["Vector"])
+    #    links.new(detail_uv_scale_node.outputs["Vector"],detail_normal_node.inputs["Vector"])
 
-    detail_uv_scale_node.inputs["Scale"].default_value[0] = Material.msfs_detail_uv_scale
-    detail_uv_scale_node.inputs["Scale"].default_value[1] = Material.msfs_detail_uv_scale
-    detail_uv_scale_node.inputs["Scale"].default_value[2] = Material.msfs_detail_uv_scale
+    #detail_uv_scale_node.inputs["Scale"].default_value[0] = Material.msfs_detail_uv_scale
+    #detail_uv_scale_node.inputs["Scale"].default_value[1] = Material.msfs_detail_uv_scale
+    #detail_uv_scale_node.inputs["Scale"].default_value[2] = Material.msfs_detail_uv_scale
 
 def CreateBlendMask(Material, offset=(0.0,0.0)):
     nodes = Material.node_tree.nodes

@@ -482,7 +482,7 @@ class MSFS_LI_material():
             mat.msfs_show_behind_glass = False
             mat.msfs_show_wiper_mask = False #Unlock this when available
 
-            mat.msfs_show_blend_mode = False
+            mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
 
             mat.msfs_show_draworder = True
@@ -915,17 +915,18 @@ class MSFS_LI_material():
         if detail_albedo != None:
             nodes["detail_albedo"].image = mat.msfs_detail_albedo_texture
             
-            if mat.msfs_detail_albedo_texture.name != "":
-                # Create the link:
-                if (detail_albedo != None and albedo_detail_mix != None):
-                    links.new(detail_albedo.outputs["Color"], albedo_detail_mix.inputs["Color2"])
-                    albedo_detail_mix.inputs[0].default_value = 0.5
-            else:
-                #unlink the separator:
-                if (detail_albedo != None and albedo_detail_mix != None):
-                    l = albedo_detail_mix.inputs["Color2"].links[0]
-                    links.remove(l)                
-                    albedo_detail_mix.inputs[0].default_value = 0.0
+            if nodes["detail_albedo"].image != None:
+                if mat.msfs_detail_albedo_texture.name != "":
+                    # Create the link:
+                    if (detail_albedo != None and albedo_detail_mix != None):
+                        links.new(detail_albedo.outputs["Color"], albedo_detail_mix.inputs["Color2"])
+                        albedo_detail_mix.inputs[0].default_value = 0.5
+                else:
+                    #unlink the separator:
+                    if (detail_albedo != None and albedo_detail_mix != None):
+                        l = albedo_detail_mix.inputs["Color2"].links[0]
+                        links.remove(l)                
+                        albedo_detail_mix.inputs[0].default_value = 0.0
 
     def match_detail_metallic(self, context):
         mat = context.active_object.active_material
@@ -960,18 +961,19 @@ class MSFS_LI_material():
 
         if detail_normal != None:
             detail_normal.image = mat.msfs_detail_normal_texture
-            detail_normal.image.colorspace_settings.name = 'Non-Color'
-            if mat.msfs_detail_normal_texture.name != "":
-                # Create the link:
-                if (detail_normal != None and normal_detail_mix != None):
-                    links.new(detail_normal.outputs["Color"], normal_detail_mix.inputs["Color2"])
-                    normal_detail_mix.inputs[0].default_value = 0.5
-            else:
-                #unlink the separator:
-                if (detail_normal != None and normal_detail_mix != None):
-                    l = normal_detail_mix.inputs["Color2"].links[0]
-                    links.remove(l)                
-                    normal_detail_mix.inputs[0].default_value = 0.0
+            if detail_normal.image != None:
+                detail_normal.image.colorspace_settings.name = 'Non-Color'
+                if mat.msfs_detail_normal_texture.name != "":
+                    # Create the link:
+                    if (detail_normal != None and normal_detail_mix != None):
+                        links.new(detail_normal.outputs["Color"], normal_detail_mix.inputs["Color2"])
+                        normal_detail_mix.inputs[0].default_value = 0.5
+                else:
+                    #unlink the separator:
+                    if (detail_normal != None and normal_detail_mix != None):
+                        l = normal_detail_mix.inputs["Color2"].links[0]
+                        links.remove(l)                
+                        normal_detail_mix.inputs[0].default_value = 0.0
 
     def match_blend_mask(self, context):
         mat = context.active_object.active_material

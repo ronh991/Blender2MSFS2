@@ -898,7 +898,7 @@ class GLTF_PT_export_geometry_compression_ext_gltf(bpy.types.Panel):
         col = layout.column(align=True)
         col.prop(operator, 'export_draco_position_quantization', text="Quantize Position")
         col.prop(operator, 'export_draco_normal_quantization', text="Normal")
-        col.prop(operator, 'export_draco_texcoord_quantization', text="Tex Coord")
+        col.prop(operator, 'export_draco_texcoord_quantization', text="Tex Coords")
         col.prop(operator, 'export_draco_color_quantization', text="Color")
         col.prop(operator, 'export_draco_generic_quantization', text="Generic")
 
@@ -1064,7 +1064,7 @@ class ExportExtendedGLTF2(bpy.types.Operator, ExportExtendedGLTF2_Base, ExportHe
 
 
 def menu_func_export(self, context):
-    self.layout.operator(ExportExtendedGLTF2.bl_idname, text='extended glTF 2.0 (.glb/.gltf) for MSFS (v0.42.1)')
+    self.layout.operator(ExportExtendedGLTF2.bl_idname, text='extended glTF 2.0 (.glb/.gltf) for MSFS (v0.42.2)')
 
 
 class ImportGLTF2(Operator, ImportHelper):

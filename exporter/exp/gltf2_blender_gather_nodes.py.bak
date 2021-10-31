@@ -434,8 +434,6 @@ def __gather_name(blender_object, export_settings):
 
 
 def __gather_trans_rot_scale(blender_object, export_settings):
-    import mathutils
-
     if blender_object.matrix_parent_inverse == Matrix.Identity(4):
         trans = blender_object.location
 

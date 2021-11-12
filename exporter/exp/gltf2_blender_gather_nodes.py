@@ -50,7 +50,6 @@ def gather_node(blender_object, library, blender_scene, dupli_object_parent, exp
 
 @cached
 def __gather_node(blender_object, library, blender_scene, dupli_object_parent, export_settings):
-    print_console('WARNING', 'start gather node')
 
     children, only_bone_children = __gather_children(blender_object, blender_scene, export_settings)
 
@@ -63,7 +62,6 @@ def __gather_node(blender_object, library, blender_scene, dupli_object_parent, e
     # Check to know if object is exported is already done, so we don't check
     # again if object is instanced in scene : this check was already done when exporting object itself
     if not __filter_node(blender_object, blender_scene, export_settings):
-        print_console('WARNING', 'start filter node')
         if children:
             # This node should be filtered out, but has un-filtered children present.
             # So, export this node, excluding its camera, mesh, skin, and weights.
@@ -79,7 +77,6 @@ def __gather_node(blender_object, library, blender_scene, dupli_object_parent, e
             # This node is filtered out, and has no un-filtered children or descendants.
             return None
     else:
-        print_console('WARNING', 'start else filter node')
         # This node is being fully exported.
         camera = __gather_camera(blender_object, export_settings)
         mesh = __gather_mesh(blender_object, library, export_settings)
@@ -106,7 +103,6 @@ def __gather_node(blender_object, library, blender_scene, dupli_object_parent, e
         node.translation, node.rotation, node.scale = __gather_trans_rot_scale(blender_object, export_settings)
 
     if export_settings[gltf2_blender_export_keys.YUP]:
-        print_console('WARNING', 'start export settings')
         # Checking node.extensions is making sure that the type of lamp is managed, and will be exported
         if blender_object.type == 'LIGHT' and export_settings[gltf2_blender_export_keys.LIGHTS] and node.extensions:
             correction_node = __get_correction_node(blender_object, export_settings)
@@ -119,9 +115,7 @@ def __gather_node(blender_object, library, blender_scene, dupli_object_parent, e
             node.children.append(correction_node)
         node.camera = None
 
-    print_console('WARNING', 'Running Export user extensions')
     export_user_extensions('gather_node_hook', export_settings, node, blender_object)
-    print_console('WARNING', 'return from Export user extensions')
 
     return node
 

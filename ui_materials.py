@@ -67,6 +67,8 @@ class MSFS_PT_material(bpy.types.Panel):
                 box.prop(mat, "msfs_rain_drop_scale")
                 box.prop(mat, "msfs_wiper_1_state")
                 box.prop(mat, "msfs_wiper_2_state")
+                box.prop(mat, "msfs_wiper_3_state")
+                box.prop(mat, "msfs_wiper_4_state")
 
             if mat.msfs_show_decal_parameters == True:
                 box = layout.box()

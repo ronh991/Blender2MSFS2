@@ -1256,6 +1256,18 @@ class MSFS_LI_material():
         max=1.0,
         default=0.0
     )  # The 3DS Max plugin has up to 4 states, but the last 2 aren't visible
+    Material.msfs_wiper_3_state = FloatProperty(
+        name="Wiper 1 State",
+        min=0.0,
+        max=1.0,
+        default=0.0
+    )
+    Material.msfs_wiper_4_state = FloatProperty(
+        name="Wiper 1 State",
+        min=0.0,
+        max=1.0,
+        default=0.0
+    )
 
     #Glass parameters:
     Material.msfs_glass_reflection_mask_factor = bpy.props.FloatProperty(name="Reflection mask factor", min=0.0,max=1.0,default=1.0)

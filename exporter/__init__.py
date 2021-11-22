@@ -74,7 +74,9 @@ from bpy.props import (StringProperty,
                        IntProperty,
                        CollectionProperty)
 from bpy.types import Operator
+from bpy.types import Operator, AddonPreferences
 from bpy_extras.io_utils import ImportHelper, ExportHelper
+import pathlib
 
 
 #
@@ -1067,7 +1069,7 @@ def menu_func_export(self, context):
     self.layout.operator(ExportExtendedGLTF2.bl_idname, text='extended glTF 2.0 (.glb/.gltf) for MSFS (v0.42.4)')
 
 
-class ImportGLTF2(Operator, ImportHelper):
+class ImportMSFSGLTF2(Operator, ImportHelper):
     """Load a glTF 2.0 file"""
     bl_idname = 'import_scene.gltf'
     bl_label = 'Import glTF 2.0'
@@ -1159,6 +1161,12 @@ class ImportGLTF2(Operator, ImportHelper):
 
         self.set_debug_log()
         import_settings = self.as_keywords()
+        if (
+            __name__ in context.preferences.addons
+        ):  # prevent an error during github workflow
+            addon_settings = context.preferences.addons[__name__].preferences
+        else:
+            addon_settings = None
 
         if self.files:
             # Multiple file import
@@ -1166,20 +1174,20 @@ class ImportGLTF2(Operator, ImportHelper):
             dirname = os.path.dirname(self.filepath)
             for file in self.files:
                 path = os.path.join(dirname, file.name)
-                if self.unit_import(path, import_settings) == {'FINISHED'}:
+                if self.unit_import(path, import_settings, addon_settings) == {'FINISHED'}:
                     ret = {'FINISHED'}
             return ret
         else:
             # Single file import
-            return self.unit_import(self.filepath, import_settings)
+            return self.unit_import(self.filepath, import_settings, addon_settings)
 
-    def unit_import(self, filename, import_settings):
+    def unit_import(self, filename, import_settings, addon_settings):
         import time
-        from .io.imp.gltf2_io_gltf import glTFImporter, ImportError
-        from .blender.imp.gltf2_blender_gltf import BlenderGlTF
+        from .com.gltf2_io_gltf import glTFImporter, ImportError
+        from .imp.gltf2_blender_gltf import BlenderGlTF
 
         try:
-            gltf_importer = glTFImporter(filename, import_settings)
+            gltf_importer = glTFImporter(filename, import_settings, addon_settings)
             gltf_importer.read()
             gltf_importer.checks()
 
@@ -1212,8 +1220,92 @@ class ImportGLTF2(Operator, ImportHelper):
             self.loglevel = logging.NOTSET
 
 
+class ImporterExporterPreferences(AddonPreferences):
+    bl_idname = __name__
+
+    texconv_file: StringProperty(
+        name='Folder path',
+        description='Absolute path to Microsoft texconv tool',
+        default='',
+        subtype='FILE_PATH',
+    )
+
+    texture_output_dir: StringProperty(
+        name='Folder path',
+        description='Location where converted textures are saved',
+        default='',
+        subtype='DIR_PATH',
+    )
+
+    flight_sim_dir: StringProperty(
+        name='Folder path',
+        description='Absolute path to the Flight Simulator installation '
+        '(where your Community and Official folders are)',
+        default='',
+        subtype='DIR_PATH',
+    )
+
+    def draw(self, context):
+        layout = self.layout
+        box = layout.box()
+
+        # texconv
+        row = box.row()
+        row.label(text='Microsoft Texconv Tool')
+        row = box.row()
+        row.label(
+            text='This tool automatically converts DDS images for usage ' 'in Blender'
+        )
+        row = box.row()
+        row.operator(
+            'wm.url_open', text='Download texconv.exe'
+        ).url = 'https://github.com/microsoft/DirectXTex/releases/latest/download/texconv.exe'
+        row = box.row()
+        row.prop(self, 'texconv_file', text='Path to texconv.exe')
+
+        texconv_path = pathlib.Path(self.texconv_file)
+        if self.texconv_file == '' or not texconv_path.exists():
+            row = box.row()
+            row.label(
+                text='No texconv.exe file has been selected. Texture import is disabled',
+                icon='ERROR',
+            )
+
+        # Texture output directory
+        box = layout.box()
+        row = box.row()
+        row.prop(self, 'texture_output_dir', text='Path for converted textures')
+        texture_path = pathlib.Path(self.texture_output_dir)
+        if (
+            self.texture_output_dir == ''
+            or not texture_path.exists()
+            or not texture_path.is_dir()
+        ):
+            row = box.row()
+            row.label(
+                text='No valid texture output directory entered. Texture import is disabled',
+                icon='ERROR',
+            )
+
+        # Flight simulator installation directory
+        box = layout.box()
+        row = box.row()
+        row.prop(self, 'flight_sim_dir', text='Path to Flight Simulator (root level)')
+        flightsim_path = pathlib.Path(self.flight_sim_dir)
+        if (
+            self.flight_sim_dir == ''
+            or not flightsim_path.exists()
+            or not flightsim_path.is_dir()
+        ):
+            row = box.row()
+            row.label(
+                text='No valid Flight Simulator path entered. Texture import is disabled',
+                icon='ERROR',
+            )
+
+
 def menu_func_import(self, context):
-    self.layout.operator(ImportGLTF2.bl_idname, text='glTF 2.0 (.glb/.gltf) (MSFS v0.42.x)')
+    self.layout.operator(ImportMSFSGLTF2.bl_idname, text='glTF 2.0 (.glb/.gltf) (MSFS v0.42.x)')
 
 
 classes = (
@@ -1229,8 +1321,19 @@ classes = (
     GLTF_PT_export_animation_shapekeys_ext_gltf,
     GLTF_PT_export_animation_skinning_ext_gltf,
     GLTF_PT_export_user_extensions,
+    ImportMSFSGLTF2,
+    ImporterExporterPreferences,
 )
 
+from .com import (
+    gltf2_blender_flight_sim_material_ui,
+    gltf2_blender_flight_sim_material_properties,
+)
+
+modules = (
+    gltf2_blender_flight_sim_material_ui,
+    gltf2_blender_flight_sim_material_properties,
+)
 
 def register():
     for c in classes:
@@ -1238,16 +1341,20 @@ def register():
             bpy.utils.register_class(c)
         except:
             pass
+    for m in modules:
+        m.register()
     # bpy.utils.register_module(__name__)
 
     # add to the export / import menu
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export)
-#    bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
+    bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
 
 
 def unregister():
     for c in classes:
         bpy.utils.unregister_class(c)
+    for m in modules:
+        m.unregister()
     for f in extension_panel_unregister_functors:
         f()
     extension_panel_unregister_functors.clear()
@@ -1256,4 +1363,4 @@ def unregister():
 
     # remove from the export / import menu
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_export)
-#    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
+    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)

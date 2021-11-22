@@ -1304,9 +1304,6 @@ class ImporterExporterPreferences(AddonPreferences):
             )
 
 
-def menu_func_import(self, context):
-    self.layout.operator(ImportMSFSGLTF2.bl_idname, text='glTF 2.0 (.glb/.gltf) (MSFS v0.42.x)')
-
 
 classes = (
     ExportExtendedGLTF2,
@@ -1321,8 +1318,6 @@ classes = (
     GLTF_PT_export_animation_shapekeys_ext_gltf,
     GLTF_PT_export_animation_skinning_ext_gltf,
     GLTF_PT_export_user_extensions,
-    ImportMSFSGLTF2,
-    ImporterExporterPreferences,
 )
 
 from .com import (
@@ -1347,7 +1342,7 @@ def register():
 
     # add to the export / import menu
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export)
-    bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
+    #bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
 
 
 def unregister():
@@ -1363,4 +1358,4 @@ def unregister():
 
     # remove from the export / import menu
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_export)
-    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
+    #bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)

@@ -148,8 +148,8 @@ class glTF2ExportUserExtension:
 
                 if blender_material.msfs_show_windshield_options == True:
                     if blender_material.msfs_rain_drop_scale > 0:
-                        gltf2_material.extensions["ASOBO_material_windshield"] = self.Extension(
-                            name="ASOBO_material_windshield",
+                        gltf2_material.extensions["ASOBO_material_windshield_v2"] = self.Extension(
+                            name="ASOBO_material_windshield_v2",
                             extension={ "rainDropScale": blender_material.msfs_rain_drop_scale,
                             "wiper1State": blender_material.msfs_wiper_1_state,
                             "wiper2State": blender_material.msfs_wiper_2_state,

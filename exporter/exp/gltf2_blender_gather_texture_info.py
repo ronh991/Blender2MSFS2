@@ -21,9 +21,9 @@ from . import gltf2_blender_search_node_tree
 from . import gltf2_blender_get
 from .gltf2_blender_get import previous_node
 from .gltf2_blender_gather_sampler import detect_manual_uv_wrapping
-from ..com.gltf2_io_debug import print_console
 from ..com.gltf2_io_extensions import Extension
 from .gltf2_io_user_extensions import export_user_extensions
+#from ..com.gltf2_io_debug import print_console
 
 # blender_shader_sockets determine the texture and primary_socket determines
 # the textranform and UVMap. Ex: when combining an ORM texture, for

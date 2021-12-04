@@ -241,7 +241,6 @@ def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
     links.new(normal_detail_mix.outputs["Color"], normal_map_node.inputs["Color"])
     #link to bsdf
     #links.new(normal_map_node.outputs["Normal"], bsdf_node.inputs["Normal"])
-    # Pearlscent nodes required here somewhere
 
 
 def CreateEmissiveBranch(Material, bsdf_node, offset=(0.0,0.0)):

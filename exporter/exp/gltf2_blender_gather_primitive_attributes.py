@@ -42,7 +42,7 @@ from ..com import gltf2_io
 from ..com import gltf2_io_constants
 from ..com import gltf2_io_debug
 from . import gltf2_io_binary_data
-from . import gltf2_blender_utils
+#from . import gltf2_blender_utils
 
 
 def gather_primitive_attributes(blender_primitive, export_settings):

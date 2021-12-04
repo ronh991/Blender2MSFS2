@@ -17,12 +17,12 @@ import bpy
 from ..com import gltf2_io
 from ..com.gltf2_io_debug import print_console
 from . import gltf2_blender_gather_nodes
-#from io_scene_gltf2.blender.exp import gltf2_blender_gather_nodes
 from . import gltf2_blender_gather_animations
 from .gltf2_blender_gather_cache import cached
 from ..com.gltf2_blender_extras import generate_extras
 from . import gltf2_blender_export_keys
 from .gltf2_io_user_extensions import export_user_extensions
+#from io_scene_gltf2.blender.exp import gltf2_blender_gather_nodes
 
 
 def gather_gltf2(export_settings):

@@ -48,7 +48,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -96,7 +96,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = True
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -144,7 +144,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -192,7 +192,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -240,7 +240,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -288,7 +288,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = True
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -336,7 +336,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -384,7 +384,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -432,7 +432,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = True
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -541,7 +541,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -589,7 +589,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = True
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -637,7 +637,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -685,7 +685,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = True
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -733,7 +733,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided
@@ -779,7 +779,7 @@ class MSFS_LI_material():
             mat.msfs_show_anisotropic_direction = False
             mat.msfs_show_clearcoat = False
             mat.msfs_show_behind_glass = False
-            msfs_show_wiper_mask = False
+            mat.msfs_show_wiper_mask = False
 
             mat.msfs_show_blend_mode = False
             mat.use_backface_culling = not mat.msfs_double_sided

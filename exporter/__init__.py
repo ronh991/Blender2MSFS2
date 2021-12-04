@@ -6,7 +6,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#    http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,7 +29,7 @@ import bpy
 bl_info = {
     'name': 'glTF 2.0 extended format',
     'author': 'Ron Haertel, Julien Duroure, Scurest, Norbert Nopper, Urs Hanselmann, Moritz Becher, Benjamin Schmithüsen, Jim Eckerlein, and many external contributors. Modified by Otmar Nitsche for use with the Blender2MSFS addon.',
-    "version": (1, 7, 30),
+    "version": (1, 8, 2),
     'blender': (3, 0, 0),
     'location': 'File > Export',
     'description': 'Export as extended glTF 2.0 for MSFS',
@@ -73,7 +73,6 @@ from bpy.props import (StringProperty,
                        EnumProperty,
                        IntProperty,
                        CollectionProperty)
-from bpy.types import Operator
 from bpy.types import Operator, AddonPreferences
 from bpy_extras.io_utils import ImportHelper, ExportHelper
 import pathlib
@@ -128,7 +127,7 @@ class ExportExtendedGLTF2_Base:
     # TODO: refactor to avoid boilerplate
 
     def __init__(self):
-        from .exp import gltf2_io_draco_compression_extension
+        from io_scene_gltf2.io.com import gltf2_io_draco_compression_extension
         self.is_draco_available = gltf2_io_draco_compression_extension.dll_exists()
 
     bl_options = {'PRESET'}
@@ -138,17 +137,18 @@ class ExportExtendedGLTF2_Base:
         items=(('GLB', 'glTF Binary (.glb)',
                 'Exports a single file, with all data packed in binary form. '
                 'Most efficient and portable, but more difficult to edit later'),
-               ('GLTF_EMBEDDED', 'glTF Embedded (.gltf)',
-                'Exports a single file, with all data packed in JSON. '
-                'Less efficient than binary, but easier to edit later'),
                ('GLTF_SEPARATE', 'glTF Separate (.gltf + .bin + textures)',
                 'Exports multiple files, with separate JSON, binary and texture data. '
-                'Easiest to edit later')),
+                'Easiest to edit later'),
+                ('GLTF_EMBEDDED', 'glTF Embedded (.gltf)',
+                 'Exports a single file, with all data packed in JSON. '
+                 'Less efficient than binary, but easier to edit later')),
         description=(
             'Output format and embedding options. Binary is most efficient, '
             'but JSON (embedded or separate) may be easier to edit later'
         ),
-        default='GLTF_SEPARATE'
+        default='GLTF_SEPARATE',
+        #update=on_export_format_changed,
     )
 
     ui_tab: EnumProperty(
@@ -169,10 +169,10 @@ class ExportExtendedGLTF2_Base:
     export_image_format: EnumProperty(
         name='Images',
         items=(('AUTO', 'Automatic',
-                'Save PNGs as PNGs and JPEGs as JPEGs.\n'
+                'Save PNGs as PNGs and JPEGs as JPEGs. '
                 'If neither one, use PNG'),
                 ('JPEG', 'JPEG Format (.jpg)',
-                'Save images as JPEGs. (Images that need alpha are saved as PNGs though.)\n'
+                'Save images as JPEGs. (Images that need alpha are saved as PNGs though.) '
                 'Be aware of a possible loss in quality'),
                ),
         description=(
@@ -248,7 +248,7 @@ class ExportExtendedGLTF2_Base:
         description='Compression level (0 = most speed, 6 = most compression, higher values currently not supported)',
         default=6,
         min=0,
-        max=6
+        max=10
     )
 
     export_draco_position_quantization: IntProperty(
@@ -296,6 +296,7 @@ class ExportExtendedGLTF2_Base:
         description='Export vertex tangents with meshes',
         default=False
     )
+
     export_materials: EnumProperty(
         name='Materials',
         items=(('EXPORT', 'Export',
@@ -307,12 +308,6 @@ class ExportExtendedGLTF2_Base:
         description='Export materials ',
         default='EXPORT'
     )
-
-    #export_materials: BoolProperty(
-    #    name='Materials',
-    #    description='Export materials',
-    #    default=True
-    #)
 
     export_colors: BoolProperty(
         name='Vertex Colors',
@@ -421,8 +416,8 @@ class ExportExtendedGLTF2_Base:
     export_nla_strips: BoolProperty(
         name='Group by NLA Track',
         description=(
-            "When on, multiple actions become part of the same glTF animation if\n"
-            "they're pushed onto NLA tracks with the same name.\n"
+            "When on, multiple actions become part of the same glTF animation if "
+            "they're pushed onto NLA tracks with the same name. "
             "When off, all the currently assigned actions become one glTF animation"
         ),
         default=True
@@ -535,7 +530,7 @@ class ExportExtendedGLTF2_Base:
         return ExportHelper.invoke(self, context, event)
 
     def save_settings(self, context):
-        # find all export_ props
+        # find all props to save
         exceptional = [
             # options that don't start with 'export_'
             'use_selection',
@@ -562,17 +557,14 @@ class ExportExtendedGLTF2_Base:
         if self.will_save_settings:
             self.save_settings(context)
 
-        if self.export_format == 'GLB':
-            self.filename_ext = '.glb'
-        else:
-            self.filename_ext = '.gltf'
+        self.check(context)  # ensure filepath has the right extension
 
         # All custom export settings are stored in this container.
         export_settings = {}
 
         export_settings['timestamp'] = datetime.datetime.now()
 
-        export_settings['gltf_filepath'] = bpy.path.ensure_ext(self.filepath, self.filename_ext)
+        export_settings['gltf_filepath'] = self.filepath
         export_settings['gltf_filedirectory'] = os.path.dirname(export_settings['gltf_filepath']) + '/'
         export_settings['gltf_texturedirectory'] = os.path.join(
             export_settings['gltf_filedirectory'],
@@ -694,8 +686,19 @@ class ExportExtendedGLTF2_Base:
         export_settings['post_export_callbacks'] = post_export_callbacks
 
         if self.export_lods == True:
+            # need to add in the code that does not belong to the khronos gltf code
+            #save XML file if required:
+            if export_settings['gltf_msfs_xml'] == True:
+                from .msfs_xml_export import save_xml
+                save_xml(context,export_settings,lods)
             return gltf2_blender_batch_export.save_ext_gltf(context, export_settings)
+            
         else:
+            # need to add in the code that does not belong to the khronos gltf code
+            #save XML file if required:
+            if export_settings['gltf_msfs_xml'] == True:
+                from .msfs_xml_export import save_xml
+                save_xml(context,export_settings,lods)
             return gltf2_blender_export.save_ext_gltf(context, export_settings)
 
     def draw(self, context):
@@ -900,7 +903,7 @@ class GLTF_PT_export_geometry_compression_ext_gltf(bpy.types.Panel):
         col = layout.column(align=True)
         col.prop(operator, 'export_draco_position_quantization', text="Quantize Position")
         col.prop(operator, 'export_draco_normal_quantization', text="Normal")
-        col.prop(operator, 'export_draco_texcoord_quantization', text="Tex Coords")
+        col.prop(operator, 'export_draco_texcoord_quantization', text="Tex Coord")
         col.prop(operator, 'export_draco_color_quantization', text="Color")
         col.prop(operator, 'export_draco_generic_quantization', text="Generic")
 
@@ -1034,7 +1037,6 @@ class GLTF_PT_export_animation_skinning_ext_gltf(bpy.types.Panel):
         layout.active = operator.export_skins
         layout.prop(operator, 'export_all_influences')
 
-
 class GLTF_PT_export_user_extensions(bpy.types.Panel):
     bl_space_type = 'FILE_BROWSER'
     bl_region_type = 'TOOL_PROPS'
@@ -1066,7 +1068,7 @@ class ExportExtendedGLTF2(bpy.types.Operator, ExportExtendedGLTF2_Base, ExportHe
 
 
 def menu_func_export(self, context):
-    self.layout.operator(ExportExtendedGLTF2.bl_idname, text='extended glTF 2.0 (.glb/.gltf) for MSFS (v0.42.4)')
+    self.layout.operator(ExportExtendedGLTF2.bl_idname, text='extended glTF 2.0 (.glb/.gltf) for MSFS (v0.42.5)')
 
 
 class ImportMSFSGLTF2(Operator, ImportHelper):
@@ -1320,24 +1322,10 @@ classes = (
     GLTF_PT_export_user_extensions,
 )
 
-#from .com import (
-#    gltf2_blender_flight_sim_material_ui,
-#    gltf2_blender_flight_sim_material_properties,
-#)
-
-#modules = (
-#    gltf2_blender_flight_sim_material_ui,
-#    gltf2_blender_flight_sim_material_properties,
-#)
 
 def register():
     for c in classes:
-        try:
-            bpy.utils.register_class(c)
-        except:
-            pass
-#    for m in modules:
-#        m.register()
+        bpy.utils.register_class(c)
     # bpy.utils.register_module(__name__)
 
     # add to the export / import menu
@@ -1348,8 +1336,6 @@ def register():
 def unregister():
     for c in classes:
         bpy.utils.unregister_class(c)
-#    for m in modules:
-#        m.unregister()
     for f in extension_panel_unregister_functors:
         f()
     extension_panel_unregister_functors.clear()

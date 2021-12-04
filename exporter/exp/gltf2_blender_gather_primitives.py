@@ -22,13 +22,13 @@ from .gltf2_blender_gather_cache import cached
 from . import gltf2_blender_extract
 from . import gltf2_blender_gather_accessors
 from . import gltf2_blender_gather_primitive_attributes
-from . import gltf2_blender_utils
 from . import gltf2_blender_gather_materials
 
 from ..com import gltf2_io
 from . import gltf2_io_binary_data
 from ..com import gltf2_io_constants
 from ..com.gltf2_io_debug import print_console
+#from . import gltf2_blender_utils
 
 
 @cached

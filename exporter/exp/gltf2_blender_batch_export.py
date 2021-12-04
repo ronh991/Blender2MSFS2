@@ -82,9 +82,9 @@ def save_ext_gltf(context, export_settings):
                 bpy.context.scene.frame_set(original_frame)
             
     #save XML file if required:
-    if export_settings['gltf_msfs_xml'] == True:
-        from .msfs_xml_export import save_xml
-        save_xml(context,export_settings,lods)
+    #if export_settings['gltf_msfs_xml'] == True:
+    #    from .msfs_xml_export import save_xml
+    #    save_xml(context,export_settings,lods)
 
     if len(lods) == 1:
         msg = "Exported one lod model."

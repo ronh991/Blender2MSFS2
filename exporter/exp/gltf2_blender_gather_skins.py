@@ -20,8 +20,8 @@ from . import gltf2_io_binary_data
 from ..com import gltf2_io_constants
 from . import gltf2_blender_gather_accessors
 from . import gltf2_blender_gather_joints
-from ..com import gltf2_blender_math
 from .gltf2_io_user_extensions import export_user_extensions
+#from ..com import gltf2_blender_math
 
 
 @cached

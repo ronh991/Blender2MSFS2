@@ -6,7 +6,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#    http://www.apache.org/licenses/LICENSE-2.0
+#     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,7 +31,6 @@ import traceback
 from ..com import gltf2_blender_json
 from . import gltf2_blender_export_keys
 from . import gltf2_blender_gather
-#from io_scene_gltf2.blender.exp import gltf2_blender_gather
 from .gltf2_blender_gltf2_exporter import GlTF2Exporter #replacing the original exporter here.
 from ..com.gltf2_io_debug import print_console, print_newline
 from . import gltf2_io_export
@@ -69,9 +68,9 @@ def save_ext_gltf(context, export_settings):
         bpy.context.scene.frame_set(original_frame)
 
     #save XML file if required:
-    if export_settings['gltf_msfs_xml'] == True:
-        from .msfs_xml_export import save_xml
-        save_xml(context,export_settings)
+    #if export_settings['gltf_msfs_xml'] == True:
+    #    from .msfs_xml_export import save_xml
+    #    save_xml(context,export_settings)
 
     return {'FINISHED'}
 

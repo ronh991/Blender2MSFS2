@@ -18,8 +18,8 @@ from ..com import gltf2_io
 from . import gltf2_blender_gather_texture_info, gltf2_blender_search_node_tree
 from . import gltf2_blender_get
 from .gltf2_blender_gather_cache import cached
-from ..com.gltf2_io_debug import print_console
 from .gltf2_io_user_extensions import export_user_extensions
+#from ..com.gltf2_io_debug import print_console
 
 
 @cached

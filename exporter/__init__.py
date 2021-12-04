@@ -686,19 +686,9 @@ class ExportExtendedGLTF2_Base:
         export_settings['post_export_callbacks'] = post_export_callbacks
 
         if self.export_lods == True:
-            # need to add in the code that does not belong to the khronos gltf code
-            #save XML file if required:
-            if export_settings['gltf_msfs_xml'] == True:
-                from .msfs_xml_export import save_xml
-                save_xml(context,export_settings,lods)
             return gltf2_blender_batch_export.save_ext_gltf(context, export_settings)
             
         else:
-            # need to add in the code that does not belong to the khronos gltf code
-            #save XML file if required:
-            if export_settings['gltf_msfs_xml'] == True:
-                from .msfs_xml_export import save_xml
-                save_xml(context,export_settings,lods)
             return gltf2_blender_export.save_ext_gltf(context, export_settings)
 
     def draw(self, context):

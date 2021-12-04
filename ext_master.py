@@ -58,7 +58,7 @@ class glTF2ExportUserExtension:
     def __init__(self):
         # We need to wait until we create the gltf2UserExtension to import the gltf2 modules
         # Otherwise, it may fail because the gltf2 may not be loaded yet
-        from .exporter.com.gltf2_io_extensions import Extension
+        from .io_scene_gltf2_msfs.io.com.gltf2_io_extensions import Extension
         self.Extension = Extension
         self.properties = bpy.context.scene.msfs_extAsoboProperties
 
@@ -199,7 +199,7 @@ class glTF2ExportUserExtension:
 
                 #Let's inject some detail maps, through Asobo extensions:
                 if (blender_material.msfs_show_detail_albedo == True or blender_material.msfs_show_detail_metallic == True or blender_material.msfs_show_detail_normal == True):
-                    from .exporter.exp.gltf2_blender_gather_texture_info import gather_texture_info
+                    from .io_scene_gltf2_msfs.blender.exp.gltf2_blender_gather_texture_info import gather_texture_info
 
                     nodes = blender_material.node_tree.nodes
 
@@ -314,7 +314,7 @@ class glTF2ExportUserExtension:
                         required=False
                     )
                 elif blender_material.msfs_material_mode == 'msfs_parallax':
-                    from .exporter.exp.gltf2_blender_gather_texture_info import gather_texture_info
+                    from .io_scene_gltf2_msfs.blender.exp.gltf2_blender_gather_texture_info import gather_texture_info
 
                     nodes = blender_material.node_tree.nodes
 

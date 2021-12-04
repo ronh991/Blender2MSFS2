@@ -43,7 +43,8 @@ from . ui_materials import *
 
 ##################################################################################
 # Load custom glTF exporter and activate Asobo extensions:
-from . exporter import *
+# io_scene_gltf2 is a modified version of Khronos io_scene_gltf2
+from . io_scene_gltf2_msfs import *
 from . ext_master import *
 ##################################################################################
 
@@ -90,7 +91,7 @@ def register():
     except Exception:
         pass
     bpy.types.Scene.msfs_extAsoboProperties = bpy.props.PointerProperty(type=ExtAsoboProperties)
-    from .exporter import register
+    from .io_scene_gltf2_msfs import register
     register()
 
 

@@ -153,7 +153,7 @@ def __gather_texcoord(blender_primitive, export_settings):
     return attributes
 
 
-def __gather_colors(blender_primitive, export_settings):
+def __gather_colors_old_vitus_ver(blender_primitive, export_settings):
     attributes = {}
     if export_settings[gltf2_blender_export_keys.COLORS]:
         color_index = 0
@@ -170,7 +170,7 @@ def __gather_colors(blender_primitive, export_settings):
     return attributes
 
 
-def __gather_colors_new_khronos_function_not_used_for_msfs(blender_primitive, export_settings):
+def __gather_colors(blender_primitive, export_settings):
     attributes = {}
     if export_settings[gltf2_blender_export_keys.COLORS]:
         color_index = 0

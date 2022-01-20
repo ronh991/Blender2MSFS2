@@ -21,9 +21,10 @@ import bpy
 class ExtAsoboProperties(bpy.types.PropertyGroup):
     enabled: bpy.props.BoolProperty(
         name='ASOBO extensions',
-        description='ASOBO extension for glTF.',
+        description='ASOBO extension for glTF',
         default=True
-        )
+    )
+
 
 class GLTF_PT_AsoboExtensionPanel(bpy.types.Panel):
 
@@ -41,7 +42,7 @@ class GLTF_PT_AsoboExtensionPanel(bpy.types.Panel):
 
     def draw_header(self, context):
         layout = self.layout
-        layout.label(text="Blender2MSFS Extensions",icon='TOOL_SETTINGS')
+        layout.label(text="Blender2MSFS Extensions", icon='TOOL_SETTINGS')
 
     def draw(self, context):
         props = bpy.context.scene.msfs_extAsoboProperties
@@ -54,6 +55,10 @@ class GLTF_PT_AsoboExtensionPanel(bpy.types.Panel):
 
 
 class glTF2ExportUserExtension:
+
+    ## all glTF2ExportUserExtension  must be decalred here
+    # the khronos exporter look only of the __init__ in the preferences-> addons modules
+    # look \io_scene_gltf2\__init__.py line 622
 
     def __init__(self):
         # We need to wait until we create the gltf2UserExtension to import the gltf2 modules
@@ -359,5 +364,3 @@ class glTF2ExportUserExtension:
                     gltf2_material.extras["ASOBO_material_code"] = "Porthole"
                 elif blender_material.msfs_material_mode == 'msfs_windshield':
                     gltf2_material.extras["ASOBO_material_code"] = "Windshield"
-
-

@@ -42,7 +42,7 @@ def MakeMasked(Material):
     bsdf_node = nodes.get("bsdf")
     alpha_multiply = nodes.get("alpha_multiply")
     if (bsdf_node != None and alpha_multiply != None):
-        links.net(alpha_multiply.outputs["Value"],bsdf_node.inputs["Alpha"])
+        links.new(alpha_multiply.outputs["Value"],bsdf_node.inputs["Alpha"])
 
     Material.blend_method = 'CLIP'
 
@@ -771,7 +771,7 @@ def CreateMSFSInvisibleShader(Material):
     bsdf_node.inputs["Base Color"].default_value = (0.8,0.0,0.0,1.0)
     bsdf_node.inputs["Emission"].default_value = (0.8,0.0,0.0,1.0)
 
-    bsdf_node.inputs["Subsurface"].default_value = 0.0
+    bsdf_node.inputs["Subsurface"].default_value = 0.0    
 
     #connect the nodes:
     links.new(output_node.inputs["Surface"], bsdf_node.outputs["BSDF"])

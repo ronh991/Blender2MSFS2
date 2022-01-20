@@ -36,6 +36,7 @@ from ...io.exp import gltf2_io_image_data
 from . import gltf2_blender_export_keys
 from ...io.exp.gltf2_io_user_extensions import export_user_extensions
 
+
 class GlTF2Exporter:
     """
     The glTF exporter flattens a scene graph to a glTF serializable format.

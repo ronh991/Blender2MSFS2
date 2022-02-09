@@ -70,9 +70,9 @@ def __gather_scene(blender_scene, export_settings):
     if _active_collection == None:
         return  #might need some more error catching?
 
-    for _blender_object in [obj for obj in _active_collection.all_objects if obj.proxy is None]:
-        if _blender_object.parent is None:
-            blender_object = _blender_object.proxy if _blender_object.proxy else _blender_object
+    for blender_object in [obj for obj in _active_collection.all_objects if obj.proxy is None]:
+        if blender_object.parent is None:
+            #blender_object = _blender_object.proxy if _blender_object.proxy else _blender_object
             node = gltf2_blender_gather_nodes.gather_node(
                 blender_object,
                 blender_object.library.name if blender_object.library else None,
@@ -89,9 +89,9 @@ def __gather_animations(blender_scene, export_settings):
     animations = []
     merged_tracks = {}
 
-    for _blender_object in blender_scene.objects:
+    for blender_object in blender_scene.objects:
 
-        blender_object = _blender_object.proxy if _blender_object.proxy else _blender_object
+        #blender_object = _blender_object.proxy if _blender_object.proxy else _blender_object
 
         # First check if this object is exported or not. Do not export animation of not exported object
         obj_node = gltf2_blender_gather_nodes.gather_node(blender_object,

@@ -26,7 +26,7 @@ from ...io.exp.gltf2_io_user_extensions import export_user_extensions
 #from ..com.gltf2_io_debug import print_console
 
 # blender_shader_sockets determine the texture and primary_socket determines
-# the textranform and UVMap. Ex: when combining an ORM texture, for
+# the textransform and UVMap. Ex: when combining an ORM texture, for
 # occlusion the primary_socket would be the occlusion socket, and
 # blender_shader_sockets would be the (O,R,M) sockets.
 

@@ -1,7 +1,7 @@
 # Blender2MSFS2
 Collaborative adoption of Blender2MSFS which apparently has been left in limbo by its author
 
-Ron Haertel - 0.42.x author (super experimental - DO NOT USE FOR PRODUCTION - ALPHA testing only)
+Ron Haertel - 0.42.x author (experimantal - good for production use)
 Ver 0.42.x - Updated to the latest Khronos version of the blender gltf exporter with the MSFS 2020 specific
 ASOBO gltf extensions
 New - Pearlescnet - operationl
@@ -12,6 +12,8 @@ New - Windshield Rain drop scale and wiper 1,2
 Fixed Windshield - alpha panel information not appearing.
 
 Fixed Soptlight error in updated code.
+
+3DS naming of texture slots like 3DS version for windshield and geodecalfrosted
 
 The releases of the upstream Blender2MSFS are archived at
 https://www.fsdeveloper.com/forum/resources/blender2msfs-toolkit.256/history

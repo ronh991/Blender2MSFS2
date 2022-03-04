@@ -474,7 +474,7 @@ class MSFS_LI_material():
             mat.msfs_show_normal = True
             mat.msfs_show_emissive = True
             mat.msfs_show_detail_albedo = True
-            mat.msfs_show_detail_metallic = True
+            mat.msfs_show_detail_metallic = False
             mat.msfs_show_detail_normal = True
             mat.msfs_show_blend_mask = True
             mat.msfs_show_anisotropic_direction = False

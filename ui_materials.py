@@ -120,7 +120,7 @@ class MSFS_PT_material(bpy.types.Panel):
                 box = layout.box()
                 box.label(text="Texture maps",icon='TEXTURE')
                 if mat.msfs_show_albedo == True:
-                    box.label(text = "Albedo:")
+                    box.label(text = "Albedo (Base Color):")
                     box.template_ID(mat, "msfs_albedo_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_metallic == True:
                     box.label(text = "Metallic:")
@@ -130,12 +130,17 @@ class MSFS_PT_material(bpy.types.Panel):
                     box.label(text = "Normal:")
                     box.template_ID(mat, "msfs_normal_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_emissive == True:
-                    box.label(text = "Emissive:")
+                    if mat.msfs_material_mode == 'msfs_windshield':
+                        box.label(text = "Emissive:")
+                    else:
+                        box.label(text = "Secondary Details(A):")
                     box.template_ID(mat, "msfs_emissive_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_detail_albedo == True:
-                    box.label(text = "Detail Albedo:")
                     if mat.msfs_material_mode == 'msfs_windshield':
-                        box.label(text="(Scratches (R), Fingerprints(B))")
+                        box.label(text = "Details:")
+                        box.label(text="(Scratches (R), Dirt (G), Fingerprints(B))")
+                    else:
+                        box.label(text = "Details Albedo (Color RGB) Alpha(A):")
                     box.template_ID(mat, "msfs_detail_albedo_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_detail_metallic == True:
                     box.label(text = "Detail Metallic:")

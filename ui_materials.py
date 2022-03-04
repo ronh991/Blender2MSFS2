@@ -92,7 +92,7 @@ class MSFS_PT_material(bpy.types.Panel):
             if mat.msfs_show_ghost_parameters == True:
                 box = layout.box()
                 box.label(text="Ghost parameters", icon='COLORSET_13_VEC')
-                box.prop(mat, 'msfs_ghost_bias')
+                box.prop(mat, 'msfs_ghost_biasfactor')
                 box.prop(mat, 'msfs_ghost_power')
                 box.prop(mat, 'msfs_ghost_scale')
 

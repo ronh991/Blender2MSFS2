@@ -21,7 +21,7 @@ bl_info = {
     "author" : "Otmar Nitsche, updated by Ron Haertel (FBW import code)",
     "description" : "This toolkit prepares your 3D assets to be used for Microsoft Flight Simulator. Copyright (c) 2020 Otmar Nitsche, 2021 Ron Haertel",
     "blender" : (3, 00, 0),
-    "version" : (0, 42, 8),
+    "version" : (0, 42, 9),
     "location" : "View3D",
     "warning" : "This version of the addon is work-in-progress. Don't use it in your active development cycle, as it adds variables and objects to the scene that may cause issues further down the line.",
     "category" : "3D View",

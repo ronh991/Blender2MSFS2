@@ -134,18 +134,18 @@ class MSFS_PT_material(bpy.types.Panel):
                     box.template_ID(mat, "msfs_emissive_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_detail_albedo == True:
                     box.label(text = "Detail Albedo:")
-                    if mat.msfs_material_mode == 'windshield':
+                    if mat.msfs_material_mode == 'msfs_windshield':
                         box.label(text="(Scratches (R), Fingerprints(B))")
                     box.template_ID(mat, "msfs_detail_albedo_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_detail_metallic == True:
                     box.label(text = "Detail Metallic:")
-                    if mat.msfs_material_mode == 'geo_decal':
+                    if mat.msfs_material_mode == 'msfs_geo_decal':
                         box.label(text="(Melt Pattern(R),Roughness(G),Metallic(B))")
                     else:
                         box.label(text="(Occlusion(R),Roughness(G),Metallic(B))")
                     box.template_ID(mat, "msfs_detail_metallic_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_detail_normal == True:
-                    if mat.msfs_material_mode == 'windshield':
+                    if mat.msfs_material_mode == 'msfs_windshield':
                         box.label(text = "Icing Normal:")
                     else:
                         box.label(text = "Detail Normal:")

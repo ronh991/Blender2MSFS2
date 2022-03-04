@@ -758,6 +758,55 @@ class MSFS_LI_material():
             
             print("Switched to msfs_invisible material.")
 
+        elif mat.msfs_material_mode == 'msfs_ghost':
+            CreateMSFSFresnelShader(mat)
+
+            mat.msfs_show_tint = True
+            mat.msfs_show_sss_color = False
+
+            mat.msfs_show_glass_parameters = False
+            mat.msfs_show_decal_parameters = False
+            mat.msfs_show_fresnel_parameters = True
+            mat.msfs_show_parallax_parameters = False
+            mat.msfs_show_geo_decal_parameters = False
+
+            mat.msfs_show_albedo = True
+            mat.msfs_show_metallic = True
+            mat.msfs_show_normal = True
+            mat.msfs_show_emissive = True
+            mat.msfs_show_detail_albedo = False
+            mat.msfs_show_detail_metallic = False
+            mat.msfs_show_detail_normal = False
+            mat.msfs_show_blend_mask = False
+            mat.msfs_show_anisotropic_direction = False
+            mat.msfs_show_clearcoat = False
+            mat.msfs_show_behind_glass = False
+            mat.msfs_show_wiper_mask = False
+
+            mat.msfs_show_blend_mode = True
+            mat.use_backface_culling = not mat.msfs_double_sided
+
+            mat.msfs_show_draworder = True
+            mat.msfs_show_no_cast_shadow = True
+            mat.msfs_show_double_sided = True
+            mat.msfs_show_responsive_aa = False
+            mat.msfs_show_day_night_cycle = False
+
+            mat.msfs_show_collision_material = True
+            mat.msfs_show_road_material = True
+
+            mat.msfs_show_ao_use_uv2 = True
+            mat.msfs_show_uv_clamp = True
+
+            mat.msfs_show_alpha_cutoff = False
+            mat.msfs_show_blend_threshold = True
+            #New
+            mat.msfs_show_pearl = False
+            mat.msfs_show_windshield_options = False
+
+            print("Switched to msfs_ghost material.")
+
+
         else:
             mat.msfs_show_tint = False
             mat.msfs_show_sss_color = False
@@ -1177,13 +1226,14 @@ class MSFS_LI_material():
                                                                 ('msfs_clearcoat', "MSFS Clearcoat",""),
                                                                 ('msfs_env_occluder', "MSFS Environment Occluder",""),
                                                                 ('msfs_fake_terrain', "MSFS Fake Terrain",""),
-                                                                ('msfs_fresnel', "MSFS Fresnel Blending",""),
+                                                                ('msfs_fresnel', "MSFS Fresnel Fade",""),
                                                                 ('msfs_windshield', "MSFS Windshield",""),
                                                                 ('msfs_porthole', "MSFS Porthole",""),
                                                                 ('msfs_parallax', "MSFS Parallax",""),
                                                                 ('msfs_geo_decal', "MSFS Geo Decal Frosted",""),
                                                                 ('msfs_hair', "MSFS Hair",""),
-                                                                ('msfs_invisible', "MSFS Invisible",""),), default='NONE',update=switch_msfs_material,)
+                                                                ('msfs_invisible', "MSFS Invisible",""),
+                                                                ('msfs_ghost', "MSFS Ghost",""), default='NONE',update=switch_msfs_material,)
 
     # Some flags to control the visibility of all of the paramters in the UI. 
     # Note: they don't control the actualy material parameters, only whether or 

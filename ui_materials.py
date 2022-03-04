@@ -131,9 +131,9 @@ class MSFS_PT_material(bpy.types.Panel):
                     box.template_ID(mat, "msfs_normal_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_emissive == True:
                     if mat.msfs_material_mode == 'msfs_windshield':
-                        box.label(text = "Emissive:")
-                    else:
                         box.label(text = "Secondary Details(A):")
+                    else:
+                        box.label(text = "Emissive:")
                     box.template_ID(mat, "msfs_emissive_texture", new = "image.new", open = "image.open")
                 if mat.msfs_show_detail_albedo == True:
                     if mat.msfs_material_mode == 'msfs_windshield':

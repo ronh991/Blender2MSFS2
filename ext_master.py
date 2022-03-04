@@ -318,6 +318,14 @@ class glTF2ExportUserExtension:
                                 "fresnelOpacityOffset": blender_material.msfs_fresnel_opacity_bias},
                         required=False
                     )
+                elif blender_material.msfs_material_mode == 'msfs_ghost':
+                    gltf2_material.extensions["ASOBO_material_ghost"] = self.Extension(
+                        name="ASOBO_material_ghost",
+                        extension={"biasFactor": blender_material.msfs_ghost_biasfactor,
+                                "ghostPower": blender_material.msfs_ghost_power,
+                                "ghostScale": blender_material.msfs_ghost_scale},
+                        required=False
+                    )
                 elif blender_material.msfs_material_mode == 'msfs_parallax':
                     from .io_scene_gltf2_msfs.blender.exp.gltf2_blender_gather_texture_info import gather_texture_info
 

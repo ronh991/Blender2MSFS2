@@ -89,6 +89,13 @@ class MSFS_PT_material(bpy.types.Panel):
                 box.prop(mat, 'msfs_fresnel_factor')
                 box.prop(mat, 'msfs_fresnel_opacity_bias')
 
+            if mat.msfs_show_ghost_parameters == True:
+                box = layout.box()
+                box.label(text="Ghost parameters", icon='COLORSET_13_VEC')
+                box.prop(mat, 'msfs_ghost_bias')
+                box.prop(mat, 'msfs_ghost_power')
+                box.prop(mat, 'msfs_ghost_scale')
+
             if mat.msfs_show_parallax_parameters == True:
                 box = layout.box()
                 box.label(text="Parallax parameters:",icon='MATERIAL')

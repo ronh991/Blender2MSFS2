@@ -34,6 +34,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = False
             mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = False
 
@@ -82,6 +83,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = False
             mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = False
 
@@ -130,6 +132,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = False
             mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = False
 
@@ -178,6 +181,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = True
             mat.msfs_show_decal_parameters = False
             mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = False
 
@@ -226,6 +230,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = True
             mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = False
 
@@ -274,6 +279,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = False
             mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = False
 
@@ -322,6 +328,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = False
             mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = False
 
@@ -370,6 +377,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = False
             mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = False
 
@@ -418,6 +426,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = False
             mat.msfs_show_fresnel_parameters = True
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = False
 
@@ -466,6 +475,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = False
             mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = False
 
@@ -527,6 +537,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = False
             mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = False
 
@@ -575,6 +586,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = False
             mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = True
             mat.msfs_show_geo_decal_parameters = False
 
@@ -623,6 +635,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = False
             mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = True
 
@@ -671,6 +684,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = False
             mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = False
 
@@ -719,6 +733,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = False
             mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = False
 
@@ -766,7 +781,8 @@ class MSFS_LI_material():
 
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = False
-            mat.msfs_show_fresnel_parameters = True
+            mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = True
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = False
 
@@ -814,6 +830,7 @@ class MSFS_LI_material():
             mat.msfs_show_glass_parameters = False
             mat.msfs_show_decal_parameters = False
             mat.msfs_show_fresnel_parameters = False
+            mat.msfs_show_ghost_parameters = False
             mat.msfs_show_parallax_parameters = False
             mat.msfs_show_geo_decal_parameters = False
 
@@ -1233,7 +1250,7 @@ class MSFS_LI_material():
                                                                 ('msfs_geo_decal', "MSFS Geo Decal Frosted",""),
                                                                 ('msfs_hair', "MSFS Hair",""),
                                                                 ('msfs_invisible', "MSFS Invisible",""),
-                                                                ('msfs_ghost', "MSFS Ghost",""), default='NONE',update=switch_msfs_material,)
+                                                                ('msfs_ghost', "MSFS Ghost","")), default='NONE',update=switch_msfs_material,)
 
     # Some flags to control the visibility of all of the paramters in the UI. 
     # Note: they don't control the actualy material parameters, only whether or 
@@ -1245,6 +1262,7 @@ class MSFS_LI_material():
     Material.msfs_show_windshield_options = bpy.props.BoolProperty(name="show_glass_parameters",default=False)
     Material.msfs_show_decal_parameters = bpy.props.BoolProperty(name="show_decal_parameters",default=False)
     Material.msfs_show_fresnel_parameters = bpy.props.BoolProperty(name="show_fresnel_parameters",default=False)
+    Material.msfs_show_ghost_parameters = bpy.props.BoolProperty(name="show_ghost_parameters",default=False)
     Material.msfs_show_parallax_parameters = bpy.props.BoolProperty(name="show_parallax_parameters",default=False)
     Material.msfs_show_geo_decal_parameters = bpy.props.BoolProperty(name="show_geo_decal_parameters",default=False)
 
@@ -1360,6 +1378,11 @@ class MSFS_LI_material():
     #Fresnel parameters:
     Material.msfs_fresnel_factor = bpy.props.FloatProperty(name="Fresnel factor", min=0.0,max=1.0,default=1.0)
     Material.msfs_fresnel_opacity_bias = bpy.props.FloatProperty(name="Fresnel opacity bias", min=0.0,max=1.0,default=1.0)
+
+    #Ghost parameters:
+    Material.msfs_ghost_biasfactor = bpy.props.FloatProperty(name="Bias factor", min=0.0,max=1.0,default=1.0)
+    Material.msfs_ghost_power = bpy.props.FloatProperty(name="Ghost Power", min=0.0,max=64.0,default=1.0)
+    Material.msfs_ghost_scale = bpy.props.FloatProperty(name="Ghost Scale", min=0.0,max=1.0,default=1.0)
 
     #Parallax parameters:
     Material.msfs_parallax_scale = bpy.props.FloatProperty(name="Scale", min=0.0,max=1.0,default=0.0)

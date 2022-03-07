@@ -114,6 +114,7 @@ class MSFS_LI_material():
 
             mat.msfs_show_ao_use_uv2 = True
             mat.msfs_show_uv_clamp = True
+            mat.msfs_show_uv_tile = True
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
@@ -163,6 +164,7 @@ class MSFS_LI_material():
 
             mat.msfs_show_ao_use_uv2 = True
             mat.msfs_show_uv_clamp = True
+            mat.msfs_show_uv_tile = True
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = False
@@ -212,6 +214,7 @@ class MSFS_LI_material():
 
             mat.msfs_show_ao_use_uv2 = True
             mat.msfs_show_uv_clamp = True
+            mat.msfs_show_uv_tile = True
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
@@ -261,6 +264,7 @@ class MSFS_LI_material():
 
             mat.msfs_show_ao_use_uv2 = True
             mat.msfs_show_uv_clamp = True
+            mat.msfs_show_uv_tile = True
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
@@ -310,6 +314,7 @@ class MSFS_LI_material():
 
             mat.msfs_show_ao_use_uv2 = True
             mat.msfs_show_uv_clamp = True
+            mat.msfs_show_uv_tile = True
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
@@ -359,6 +364,7 @@ class MSFS_LI_material():
 
             mat.msfs_show_ao_use_uv2 = False
             mat.msfs_show_uv_clamp = False
+            mat.msfs_show_uv_tile = False
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = False
@@ -408,6 +414,7 @@ class MSFS_LI_material():
 
             mat.msfs_show_ao_use_uv2 = True
             mat.msfs_show_uv_clamp = True
+            mat.msfs_show_uv_tile = True
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
@@ -457,6 +464,7 @@ class MSFS_LI_material():
 
             mat.msfs_show_ao_use_uv2 = True
             mat.msfs_show_uv_clamp = True
+            mat.msfs_show_uv_tile = True
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
@@ -506,6 +514,7 @@ class MSFS_LI_material():
 
             mat.msfs_show_ao_use_uv2 = True
             mat.msfs_show_uv_clamp = True
+            mat.msfs_show_uv_tile = True
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
@@ -568,6 +577,7 @@ class MSFS_LI_material():
 
             mat.msfs_show_ao_use_uv2 = True
             mat.msfs_show_uv_clamp = True
+            mat.msfs_show_uv_tile = True
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
@@ -617,6 +627,7 @@ class MSFS_LI_material():
 
             mat.msfs_show_ao_use_uv2 = True
             mat.msfs_show_uv_clamp = True
+            mat.msfs_show_uv_tile = True
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
@@ -666,6 +677,7 @@ class MSFS_LI_material():
 
             mat.msfs_show_ao_use_uv2 = True
             mat.msfs_show_uv_clamp = True
+            mat.msfs_show_uv_tile = True
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
@@ -715,6 +727,7 @@ class MSFS_LI_material():
 
             mat.msfs_show_ao_use_uv2 = True
             mat.msfs_show_uv_clamp = True
+            mat.msfs_show_uv_tile = True
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
@@ -763,7 +776,8 @@ class MSFS_LI_material():
             mat.msfs_show_road_material = True
 
             mat.msfs_show_ao_use_uv2 = False
-            mat.msfs_show_uv_clamp = True
+            mat.msfs_show_uv_clamp = False
+            mat.msfs_show_uv_tile = False
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = False
@@ -813,6 +827,7 @@ class MSFS_LI_material():
 
             mat.msfs_show_ao_use_uv2 = True
             mat.msfs_show_uv_clamp = True
+            mat.msfs_show_uv_tile = True
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = True
@@ -861,6 +876,7 @@ class MSFS_LI_material():
 
             mat.msfs_show_ao_use_uv2 = False
             mat.msfs_show_uv_clamp = False
+            mat.msfs_show_uv_tile = False
 
             mat.msfs_show_alpha_cutoff = False
             mat.msfs_show_blend_threshold = False
@@ -1380,9 +1396,9 @@ class MSFS_LI_material():
     Material.msfs_fresnel_opacity_bias = bpy.props.FloatProperty(name="Fresnel opacity bias", min=0.0,max=1.0,default=1.0)
 
     #Ghost parameters:
-    Material.msfs_ghost_biasfactor = bpy.props.FloatProperty(name="Bias factor", min=0.0,max=1.0,default=1.0)
-    Material.msfs_ghost_power = bpy.props.FloatProperty(name="Ghost Power", min=0.0,max=64.0,default=1.0)
-    Material.msfs_ghost_scale = bpy.props.FloatProperty(name="Ghost Scale", min=0.0,max=1.0,default=1.0)
+    Material.msfs_ghost_biasfactor = bpy.props.FloatProperty(name="Bias", min=0.0,max=1.0,default=1.0)
+    Material.msfs_ghost_power = bpy.props.FloatProperty(name="Power", min=0.0,max=64.0,default=1.0)
+    Material.msfs_ghost_scale = bpy.props.FloatProperty(name="Scale", min=0.0,max=1.0,default=1.0)
 
     #Parallax parameters:
     Material.msfs_parallax_scale = bpy.props.FloatProperty(name="Scale", min=0.0,max=1.0,default=0.0)
@@ -1436,31 +1452,31 @@ class MSFS_LI_material():
 
     #UV options:
     
-    Material.msfs_uv_offset_u = FloatProperty(
+    Material.msfs_uv_offset_u = bpy.props.FloatProperty(
         name="U",
         min=-10.0,
         max=10.0,
         default=0.0
     )
-    Material.msfs_uv_offset_v = FloatProperty(
+    Material.msfs_uv_offset_v = bpy.props.FloatProperty(
         name="V",
         min=-10.0,
         max=10.0,
         default=0.0
     )
-    Material.msfs_uv_tiling_u = FloatProperty(
+    Material.msfs_uv_tiling_u = bpy.props.FloatProperty(
         name="U",
         min=-10.0,
         max=10.0,
         default=1.0
     )
-    Material.msfs_uv_tiling_v = FloatProperty(
+    Material.msfs_uv_tiling_v = bpy.props.FloatProperty(
         name="V",
         min=-10.0,
         max=10.0,
         default=1.0
     )
-    Material.msfs_uv_rotation = FloatProperty(
+    Material.msfs_uv_rotation = bpy.props.FloatProperty(
         name="UV Rotation",
         min=-360.0,
         max=360.0,

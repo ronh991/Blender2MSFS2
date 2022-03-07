@@ -190,17 +190,29 @@ class glTF2ExportUserExtension:
                 #-double-sided injected through material settings
                 #-responsive aa missing
 
-                if (blender_material.msfs_show_ao_use_uv2 == True or blender_material.msfs_show_uv_clamp == True):
+                if (blender_material.msfs_show_ao_use_uv2 == True or blender_material.msfs_show_uv_clamp == True or blender_material.msfs_show_uv_tile == True):
+                    detail_extension = {}
                     if (blender_material.msfs_ao_use_uv2 == True or blender_material.msfs_uv_clamp_x == True or
                             blender_material.msfs_uv_clamp_y == True or blender_material.msfs_uv_clamp_z == True):
+                        detail_extension["AOUseUV2"] = blender_material.msfs_ao_use_uv2
+                        detail_extension["clampUVX"] = blender_material.msfs_uv_clamp_x
+                        detail_extension["clampUVY"] = blender_material.msfs_uv_clamp_y
+                        detail_extension["clampUVZ"] = blender_material.msfs_uv_clamp_z
+                    if (blender_material.msfs_uv_offset_u != 0.0 or blender_material.msfs_uv_offset_v != 0.0):
+                        detail_extension["UVOffsetU"] = blender_material.msfs_uv_offset_u
+                        detail_extension["UVOffsetV"] = blender_material.msfs_uv_offset_v
+                    if (blender_material.msfs_uv_tiling_u != 1.0 or blender_material.msfs_uv_tiling_v != 1.0):
+                        detail_extension["UVTilingU"] = blender_material.msfs_uv_tiling_u
+                        detail_extension["UVTilingV"] = blender_material.msfs_uv_tiling_v
+                    if (blender_material.msfs_uv_rotation != 0.0):
+                        detail_extension["UVRotation"] = blender_material.msfs_uv_rotation
+                        
+                    if len(detail_extension) > 0:
                         gltf2_material.extensions["ASOBO_material_UV_options"] = self.Extension(
                             name="ASOBO_material_UV_options",
-                            extension={ "AOUseUV2": blender_material.msfs_ao_use_uv2,
-                                        "clampUVX": blender_material.msfs_uv_clamp_x,
-                                        "clampUVY": blender_material.msfs_uv_clamp_y,
-                                        "clampUVZ": blender_material.msfs_uv_clamp_z},
+                            extension=detail_extension,
                             required=False
-                        )
+                            )
 
                 #Let's inject some detail maps, through Asobo extensions:
                 if (blender_material.msfs_show_detail_albedo == True or blender_material.msfs_show_detail_metallic == True or blender_material.msfs_show_detail_normal == True):
@@ -319,11 +331,11 @@ class glTF2ExportUserExtension:
                         required=False
                     )
                 elif blender_material.msfs_material_mode == 'msfs_ghost':
-                    gltf2_material.extensions["ASOBO_material_ghost"] = self.Extension(
-                        name="ASOBO_material_ghost",
-                        extension={"ghostbiasFactor": blender_material.msfs_ghost_biasfactor,
-                                "ghostPower": blender_material.msfs_ghost_power,
-                                "ghostScale": blender_material.msfs_ghost_scale},
+                    gltf2_material.extensions["ASOBO_material_ghost_effect"] = self.Extension(
+                        name="ASOBO_material_ghost_effect",
+                        extension={"bias": blender_material.msfs_ghost_biasfactor,
+                                "power": blender_material.msfs_ghost_power,
+                                "scale": blender_material.msfs_ghost_scale},
                         required=False
                     )
                 elif blender_material.msfs_material_mode == 'msfs_parallax':

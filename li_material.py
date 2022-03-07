@@ -1308,6 +1308,7 @@ class MSFS_LI_material():
 
     Material.msfs_show_ao_use_uv2 = bpy.props.BoolProperty(name="show_ao_use_uv2",default=False)
     Material.msfs_show_uv_clamp = bpy.props.BoolProperty(name="show_uv_clamp",default=False)
+    Material.msfs_show_uv_tile = bpy.props.BoolProperty(name="show_uv_tile",default=False)
 
     Material.msfs_show_alpha_cutoff = bpy.props.BoolProperty(name="show_alpha_cutoff",default=False)
     Material.msfs_show_blend_threshold = bpy.props.BoolProperty(name="show_blend_threshold",default=False)

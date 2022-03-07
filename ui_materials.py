@@ -236,7 +236,7 @@ class MSFS_PT_material(bpy.types.Panel):
                 if mat.msfs_show_road_material == True:
                     box.prop(mat, 'msfs_road_material')
 
-            if (mat.msfs_show_ao_use_uv2 == True or mat.msfs_show_uv_clamp == True):
+            if (mat.msfs_show_ao_use_uv2 == True or mat.msfs_show_uv_clamp == True or mat.msfs_show_uv_tile == True):
                 box = layout.box()
                 box.label(text="UV options", icon='UV')
                 #if mat.msfs_show_ao_use_uv2 == True:   - removed by Asobo

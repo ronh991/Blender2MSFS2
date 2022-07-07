@@ -1,21 +1,17 @@
 # Blender2MSFS2
-Collaborative adoption of Blender2MSFS which apparently has been left in limbo by its author
+Collaborative adoption of Blender2MSFS which apparently has been left in limbo by its author.
 
-Version 0.42.12 and beyonfd are for Blender 3.3+ - In that there is a breaking change. Blender 3.3 due to shader node naming changes SHADERNODERGB has been changed to SHADERNODECOLOR
-
-You must redo all you MSFS Materials if you open your existing pre 3.3 into this version.
-
-Ron Haertel - 0.42.x author (experimantal - good for production use)
+Ron Haertel - 0.42.x author (experimental - good for production use)
 Ver 0.42.x - Updated to the latest Khronos version of the blender gltf exporter with the MSFS 2020 specific
-ASOBO gltf extensions
-New - Pearlescnet - operationl
+ASOBO gltf extensions.
+New - Pearlescnet - operational
 New - added more UV export data - texture tiling - not operational yet.
 New - FBW - importer - not operational
 New - Windshield Rain drop scale and wiper 1,2
 
 Fixed Windshield - alpha panel information not appearing.
 
-Fixed Soptlight error in updated code.
+Fixed Spotlight error in updated code.
 
 3DS naming of texture slots like 3DS version for windshield and geodecalfrosted
 
@@ -54,16 +50,16 @@ For import from MSFS to Blender, there is
 https://github.com/bestdani/msfs2blend
 
 # How to install
-Download this repo as a .zip file. Start blender go to the settings / addons / install from file. Choos the downloaded .zip file and hit ok.
+Download this repo as a .zip file. Start blender go to the edit / preferences / addons / install using this zip file. Navigate to the downloaded .zip file and hit ok.
 
 # Original Readme from Vitus
 
 Blender2MSFS
 ============
 
-This Blender addon allows you to create 3D assets for Microsoft Flight Simulator (2020). The addon is designed for Blender 2.83, and above.
+This Blender addon allows you to create 3D assets for Microsoft Flight Simulator (2020). The addon is designed for Blender 2.95, and above.
 
-MSFS is using the Khronos' glTF 2.0 file format with multiple custom extensions and extras for special material functions. While Blender 2.8x already ships with a glTF exporter, some changes had to be made to the exporter to facilitate some of the used extensions. These changes come fully integrated into this addon, in the form of modified call functions. These functions will make use of the existing Khronos glTF 2.0 exporter, while inserting some of the custom extensions for MSFS.
+MSFS is using the Khronos' glTF 2.0 file format with multiple custom extensions and extras for special material functions. While Blender 2.9x already ships with a glTF exporter, some changes had to be made to the exporter to facilitate some of the used extensions. These changes come fully integrated into this addon, in the form of modified call functions. These functions will make use of the existing Khronos glTF 2.0 exporter, while inserting some of the custom extensions for MSFS.
 
 In order to export all the available materials, select the "extended glTF 2.0 for MSFS" in the Export menu and make sure that the "Asobo Extensions" are enabled in the export options, under "Extensions".
 
@@ -97,7 +93,7 @@ Most of the materials and parameters are well documented in the MSFS SDK. You ca
 Export
 ------
 
-The Blender2MSFS addon appends the Export options of Blender by an additional entry “extended glTF 2.0 for MSFS”, which, as the name suggests, can be used to produce MSFS compatible addons. When selecting    this option, you’re presented with the exporter dialog containing the following options:
+The Blender2MSFS addon appends the Export options of Blender by an additional entry “extended glTF 2.0 for MSFS”, which, as the name suggests, can be used to produce MSFS compatible addons. When selecting this option, you’re presented with the exporter dialog containing the following options:
 
 glTF formats
     glTF files can have three different forms: glTF binaries (.glb), glTF Embedded (.glTF) or glTF separate (.gltf + .bin + texture). For MSFS it is recommended to use the last of the three options.

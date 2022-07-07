@@ -1,16 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
 # Copyright 2018-2021 The glTF-Blender-IO authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 FILTERED_VERTEX_GROUPS = 'filtered_vertex_groups'
 FILTERED_MESHES = 'filtered_meshes'
@@ -30,6 +19,7 @@ VISIBLE = 'gltf_visible'
 RENDERABLE = 'gltf_renderable'
 ACTIVE_COLLECTION = 'gltf_active_collection'
 SKINS = 'gltf_skins'
+DEF_BONES_ONLY = 'gltf_def_bones'
 DISPLACEMENT = 'gltf_displacement'
 FORCE_SAMPLING = 'gltf_force_sampling'
 FRAME_RANGE = 'gltf_frame_range'
@@ -57,6 +47,7 @@ EMBED_IMAGES = 'gltf_embed_images'
 BINARY = 'gltf_binary'
 EMBED_BUFFERS = 'gltf_embed_buffers'
 USE_NO_COLOR = 'gltf_use_no_color'
+OPTIMIZE_ANIMS = 'gltf_optimize_animation'
 
 METALLIC_ROUGHNESS_IMAGE = "metallic_roughness_image"
 GROUP_INDEX = 'group_index'

@@ -1,7 +1,7 @@
 # Blender2MSFS2
 Collaborative adoption of Blender2MSFS which apparently has been left in limbo by its author.
 
-Ron Haertel - 0.42.x author (experimantal - good for production use)
+Ron Haertel - 0.42.x author (experimental - good for production use)
 Ver 0.42.x - Updated to the latest Khronos version of the blender gltf exporter with the MSFS 2020 specific
 ASOBO gltf extensions.
 New - Pearlescnet - operational
@@ -11,7 +11,7 @@ New - Windshield Rain drop scale and wiper 1,2
 
 Fixed Windshield - alpha panel information not appearing.
 
-Fixed Soptlight error in updated code.
+Fixed Spotlight error in updated code.
 
 3DS naming of texture slots like 3DS version for windshield and geodecalfrosted
 
@@ -93,7 +93,7 @@ Most of the materials and parameters are well documented in the MSFS SDK. You ca
 Export
 ------
 
-The Blender2MSFS addon appends the Export options of Blender by an additional entry “extended glTF 2.0 for MSFS”, which, as the name suggests, can be used to produce MSFS compatible addons. When selecting    this option, you’re presented with the exporter dialog containing the following options:
+The Blender2MSFS addon appends the Export options of Blender by an additional entry “extended glTF 2.0 for MSFS”, which, as the name suggests, can be used to produce MSFS compatible addons. When selecting this option, you’re presented with the exporter dialog containing the following options:
 
 glTF formats
     glTF files can have three different forms: glTF binaries (.glb), glTF Embedded (.glTF) or glTF separate (.gltf + .bin + texture). For MSFS it is recommended to use the last of the three options.

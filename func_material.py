@@ -188,8 +188,7 @@ def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
     metallic_detail_mix.hide = True
     metallic_detail_mix.blend_type = 'MIX'
     metallic_detail_mix.inputs[0].default_value = 0.0
-    # 3.2 changed to 3.3 way metallic_separate = CreateNewNode(Material,'ShaderNodeSeparateRGB',"metallic_sep",location=(offset[0]+550,offset[1]-305))
-    metallic_separate = CreateNewNode(Material,'ShaderNodeSeparateColor',"metallic_sep",location=(offset[0]+550,offset[1]-305))
+    metallic_separate = CreateNewNode(Material,'ShaderNodeSeparateRGB',"metallic_sep",location=(offset[0]+550,offset[1]-305))
     metallic_separate.hide = True
 
     # Create a node group for the occlusion map
@@ -210,8 +209,7 @@ def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
     links.new(uv_node.outputs["UV"], texture_metallic_node.inputs["Vector"])
     #Create metallic links:
     links.new(texture_metallic_node.outputs["Color"], metallic_detail_mix.inputs["Color1"])
-    #links.new(metallic_detail_mix.outputs["Color"], metallic_separate.inputs["Image"])
-    links.new(metallic_detail_mix.outputs["Color"], metallic_separate.inputs["Color"])
+    links.new(metallic_detail_mix.outputs["Color"], metallic_separate.inputs["Image"])
     links.new(metallic_separate.outputs[0], occlusion_group.inputs["Occlusion"])
     if Material.msfs_metallic_texture != None:
         if Material.msfs_metallic_texture.name != "":
@@ -392,8 +390,7 @@ def CreateClearcoat(Material, bsdf_node, offset=(0.0,0.0)):
         uv_node = CreateNewNode(Material,'ShaderNodeUVMap',"UV",location=(offset[0]-2000,offset[1]))
 
     clearcoat = CreateNewNode(Material,'ShaderNodeTexImage',"clearcoat",location=(offset[0],offset[1]))
-    # 3.2 changed to 3.3 way clearcoat_sep = CreateNewNode(Material,'ShaderNodeSeparateRGB',"clearcoat_sep",location=(offset[0]+350,offset[1]))
-    clearcoat_sep = CreateNewNode(Material,'ShaderNodeSeparateColor',"clearcoat_sep",location=(offset[0]+350,offset[1]))
+    clearcoat_sep = CreateNewNode(Material,'ShaderNodeSeparateRGB',"clearcoat_sep",location=(offset[0]+350,offset[1]))
     clearcoat_sep.hide = True
     links.new(clearcoat.outputs["Color"],clearcoat_sep.inputs["Image"])
 

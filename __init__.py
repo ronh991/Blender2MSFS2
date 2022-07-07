@@ -19,11 +19,11 @@
 bl_info = {
     "name" : "MSFSToolkit v 0.42.x",
     "author" : "Otmar Nitsche, updated by Ron Haertel (FBW import code)",
-    "description" : "This toolkit prepares your 3D assets to be used for Microsoft Flight Simulator. Copyright (c) 2020 Otmar Nitsche, 2021,2022 Ron Haertel",
-    "blender" : (3, 3, 0),
-    "version" : (0, 42, 12),
+    "description" : "This toolkit prepares your 3D assets to be used for Microsoft Flight Simulator. Copyright (c) 2020 Otmar Nitsche, 2021 Ron Haertel",
+    "blender" : (3, 00, 0),
+    "version" : (0, 42, 10),
     "location" : "View3D",
-    "warning" : "This version of the addon is work-in-progress. Updated for Blender 3.3 - will not work on lower version due to node changes in blender. Don't use it in your active development cycle, as it adds variables and objects to the scene that may cause issues further down the line.",
+    "warning" : "This version of the addon is work-in-progress. Don't use it in your active development cycle, as it adds variables and objects to the scene that may cause issues further down the line.",
     "category" : "3D View",
     "wiki_url": "https://www.fsdeveloper.com/wiki/index.php?title=Blender2MSFS"
 }

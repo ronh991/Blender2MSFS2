@@ -94,6 +94,7 @@ def FindNodeByType(Material, node_type):
         if node.type == node_type:
             return node
     return None
+
 # Find a node of a specific name
 def FindNodeByName(Material, node_name):
     nodes = Material.node_tree.nodes
@@ -120,6 +121,7 @@ def CreateNewNode(Material,node_type,label=None,location=(.0,.0)):
     return new_node
 
 def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
+    version = bpy.app.version_string
     nodes = Material.node_tree.nodes
     links = Material.node_tree.links
 
@@ -137,14 +139,24 @@ def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
     base_color_tint.outputs[0].default_value[1]=Material.msfs_color_albedo_mix[1]
     base_color_tint.outputs[0].default_value[2]=Material.msfs_color_albedo_mix[2]
     base_color_tint.outputs[0].default_value[3]=Material.msfs_color_alpha_mix
-    base_color_tint_mix = CreateNewNode(Material,'ShaderNodeMixRGB',"albedo_tint_mix",location=(offset[0]+350,offset[1]+20))
+    if(float(version.rsplit('.', 1)[0]) < 3.4):
+        base_color_tint_mix = CreateNewNode(Material,'ShaderNodeMixRGB',"albedo_tint_mix",location=(offset[0]+350,offset[1]+20))
+    else:
+        base_color_tint_mix = CreateNewNode(Material,'ShaderNodeMix',"albedo_tint_mix",location=(offset[0]+350,offset[1]+20))
+        base_color_tint_mix.data_type = 'RGBA'
     base_color_tint_mix.hide = True
     base_color_tint_mix.blend_type = 'MULTIPLY'
     base_color_tint_mix.inputs[0].default_value = 1.0
     base_color_tint_mix.inputs[1].default_value[0] = 1.0
     base_color_tint_mix.inputs[1].default_value[1] = 1.0
     base_color_tint_mix.inputs[1].default_value[2] = 1.0
-    base_color_detail_mix = CreateNewNode(Material,'ShaderNodeMixRGB',"albedo_detail_mix",location=(offset[0]+550,offset[1]+20))
+    
+    # color detail
+    if(float(version.rsplit('.', 1)[0]) < 3.4):
+        base_color_detail_mix = CreateNewNode(Material,'ShaderNodeMixRGB',"albedo_detail_mix",location=(offset[0]+550,offset[1]+20))
+    else:
+        base_color_detail_mix = CreateNewNode(Material,'ShaderNodeMix',"albedo_detail_mix",location=(offset[0]+550,offset[1]+20))
+        base_color_detail_mix.data_type = 'RGBA'
     base_color_detail_mix.hide = True
     base_color_detail_mix.blend_type = 'MULTIPLY'
     base_color_detail_mix.inputs[0].default_value = Material.msfs_color_base_mix
@@ -184,11 +196,18 @@ def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
     if Material.msfs_metallic_texture != None:
         if Material.msfs_metallic_texture.name != "":
             texture_metallic_node.image = Material.msfs_metallic_texture
-    metallic_detail_mix = CreateNewNode(Material,'ShaderNodeMixRGB',"metallic_detail_mix",location=(offset[0]+350,offset[1]-305))
+    if(float(version.rsplit('.', 1)[0]) < 3.4):
+        metallic_detail_mix = CreateNewNode(Material,'ShaderNodeMixRGB',"metallic_detail_mix",location=(offset[0]+350,offset[1]-305))
+    else:
+        metallic_detail_mix = CreateNewNode(Material,'ShaderNodeMix',"metallic_detail_mix",location=(offset[0]+350,offset[1]-305))
+        metallic_detail_mix.data_type = 'RGBA'
     metallic_detail_mix.hide = True
     metallic_detail_mix.blend_type = 'MIX'
     metallic_detail_mix.inputs[0].default_value = 0.0
-    metallic_separate = CreateNewNode(Material,'ShaderNodeSeparateRGB',"metallic_sep",location=(offset[0]+550,offset[1]-305))
+    if(float(version.rsplit('.', 1)[0]) < 3.3):
+        metallic_separate = CreateNewNode(Material,'ShaderNodeSeparateRGB',"metallic_sep",location=(offset[0]+550,offset[1]-305))
+    else:
+        metallic_separate = CreateNewNode(Material,'ShaderNodeSeparateColor',"metallic_sep",location=(offset[0]+550,offset[1]-305))
     metallic_separate.hide = True
 
     # Create a node group for the occlusion map
@@ -228,7 +247,11 @@ def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
             links.new(normal_map_node.outputs["Normal"], bsdf_node.inputs["Normal"])
     normal_map_node.inputs["Strength"].default_value = Material.msfs_normal_scale
     normal_map_node.hide = True
-    normal_detail_mix = CreateNewNode(Material,'ShaderNodeMixRGB',"normal_detail_mix",location=(offset[0]+350,offset[1]-926))
+    if(float(version.rsplit('.', 1)[0]) < 3.4):
+        normal_detail_mix = CreateNewNode(Material,'ShaderNodeMixRGB',"normal_detail_mix",location=(offset[0]+350,offset[1]-926))
+    else:
+        normal_detail_mix = CreateNewNode(Material,'ShaderNodeMix',"normal_detail_mix",location=(offset[0]+350,offset[1]-926))
+        normal_detail_mix.data_type = 'RGBA'
     normal_detail_mix.hide = True
     normal_detail_mix.blend_type = 'MIX'
     normal_detail_mix.use_clamp = True
@@ -262,7 +285,11 @@ def CreateEmissiveBranch(Material, bsdf_node, offset=(0.0,0.0)):
     emissive_tint.outputs[0].default_value[0]=Material.msfs_color_emissive_mix[0]
     emissive_tint.outputs[0].default_value[1]=Material.msfs_color_emissive_mix[1]
     emissive_tint.outputs[0].default_value[2]=Material.msfs_color_emissive_mix[1]
-    emissive_tint_mix = CreateNewNode(Material,'ShaderNodeMixRGB',"emissive_tint_mix",location=(offset[0]+350,offset[1]+20))
+    if(float(version.rsplit('.', 1)[0]) < 3.4):
+        emissive_tint_mix = CreateNewNode(Material,'ShaderNodeMixRGB',"emissive_tint_mix",location=(offset[0]+350,offset[1]+20))
+    else:
+        emissive_tint_mix = CreateNewNode(Material,'ShaderNodeMix',"emissive_tint_mix",location=(offset[0]+350,offset[1]+20))
+        emissive_tint_mix.data_type = 'RGBA'
     emissive_tint_mix.hide = True
     emissive_tint_mix.blend_type = 'MULTIPLY'
     emissive_tint_mix.inputs[0].default_value = 1.0
@@ -390,7 +417,10 @@ def CreateClearcoat(Material, bsdf_node, offset=(0.0,0.0)):
         uv_node = CreateNewNode(Material,'ShaderNodeUVMap',"UV",location=(offset[0]-2000,offset[1]))
 
     clearcoat = CreateNewNode(Material,'ShaderNodeTexImage',"clearcoat",location=(offset[0],offset[1]))
-    clearcoat_sep = CreateNewNode(Material,'ShaderNodeSeparateRGB',"clearcoat_sep",location=(offset[0]+350,offset[1]))
+    if(float(version.rsplit('.', 1)[0]) < 3.3):
+        clearcoat_sep = CreateNewNode(Material,'ShaderNodeSeparateRGB',"clearcoat_sep",location=(offset[0]+350,offset[1]))
+    else:
+        clearcoat_sep = CreateNewNode(Material,'ShaderNodeSeparateColor',"clearcoat_sep",location=(offset[0]+350,offset[1]))
     clearcoat_sep.hide = True
     links.new(clearcoat.outputs["Color"],clearcoat_sep.inputs["Image"])
 
@@ -398,9 +428,12 @@ def CreateClearcoat(Material, bsdf_node, offset=(0.0,0.0)):
         if Material.msfs_clearcoat_texture.name != "":
             clearcoat.image = Material.msfs_clearcoat_texture
             #Create links:
-            links.new(clearcoat_sep.outputs["R"],bsdf_node.inputs["Clearcoat"])
-            links.new(clearcoat_sep.outputs["G"],bsdf_node.inputs["Clearcoat Roughness"])
-
+            if(float(version.rsplit('.', 1)[0]) < 3.3):
+                links.new(clearcoat_sep.outputs["R"],bsdf_node.inputs["Clearcoat"])
+                links.new(clearcoat_sep.outputs["G"],bsdf_node.inputs["Clearcoat Roughness"])
+            else:
+                links.new(clearcoat_sep.outputs["Red"],bsdf_node.inputs["Clearcoat"])
+                links.new(clearcoat_sep.outputs["Green"],bsdf_node.inputs["Clearcoat Roughness"])
     #Link UV:
     links.new(uv_node.outputs["UV"], clearcoat.inputs["Vector"])   #this might need to come from the detail uv transform instead.
 

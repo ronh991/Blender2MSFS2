@@ -206,13 +206,24 @@ def __get_image_data(sockets, export_settings) -> ExportImage:
         else:
             # rudimentarily try follow the node tree to find the correct image data.
             src_chan = Channel.R
+            version = bpy.app.version_string
             for elem in result.path:
-                if isinstance(elem.from_node, bpy.types.ShaderNodeSeparateRGB):
-                    src_chan = {
-                        'R': Channel.R,
-                        'G': Channel.G,
-                        'B': Channel.B,
-                    }[elem.from_socket.name]
+                # Blender 3.2
+                if(float(version.rsplit('.', 1)[0]) < 3.3):
+                    if isinstance(elem.from_node, bpy.types.ShaderNodeSeparateRGB):
+                        src_chan = {
+                            'R': Channel.R,
+                            'G': Channel.G,
+                            'B': Channel.B,
+                        }[elem.from_socket.name]
+                else:
+                    # Blender 3.3 plus
+                    if isinstance(elem.from_node, bpy.types.ShaderNodeSeparateColor):
+                        src_chan = {
+                            'Red': Channel.Red,
+                            'Green': Channel.Green,
+                            'Blue': Channel.Blue,
+                        }[elem.from_socket.name]
                 if elem.from_socket.name == 'Alpha':
                     src_chan = Channel.A
 

@@ -21,6 +21,8 @@ from bpy.types import Material, Image
 from bpy.props import IntProperty, BoolProperty, StringProperty, FloatProperty, EnumProperty, FloatVectorProperty, PointerProperty
 from . func_material import *
 
+version = bpy.app.version_string
+
 class MSFS_LI_material():
     # Use this function to update the shader node tree
     def switch_msfs_material(self,context):
@@ -890,7 +892,12 @@ class MSFS_LI_material():
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
         links = mat.node_tree.links
-
+        if(float(version.rsplit('.', 1)[0]) < 3.4):
+            index1 = "Color2"
+            index2 = "Color"
+        else:
+            index1 = 7
+            index2 = 2
         bsdf_node = nodes.get("bsdf")
         albedo = nodes.get("albedo")
         albedo_tint_mix = nodes.get("albedo_tint_mix")
@@ -902,13 +909,13 @@ class MSFS_LI_material():
             if mat.msfs_albedo_texture != None:
                 # Create the link:
                 if albedo_tint_mix != None:
-                    links.new(albedo.outputs["Color"], albedo_tint_mix.inputs["Color2"])
+                    links.new(albedo.outputs["Color"], albedo_tint_mix.inputs[index1])
                 if albedo_detail_mix != None:
-                    links.new(albedo_detail_mix.outputs["Color"], bsdf_node.inputs["Base Color"])
+                    links.new(albedo_detail_mix.outputs[index2], bsdf_node.inputs["Base Color"])
             else:
                 #unlink the separator:
                 if albedo_tint_mix != None:
-                    l = albedo_tint_mix.inputs["Color2"].links[0]
+                    l = albedo_tint_mix.inputs[index1].links[0]
                     links.remove(l)                
                 if bsdf_node != None:
                     l = bsdf_node.inputs["Base Color"].links[0]
@@ -967,6 +974,10 @@ class MSFS_LI_material():
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
         links = mat.node_tree.links
+        if(float(version.rsplit('.', 1)[0]) < 3.4):
+            index1 = "Color"
+        else:
+            index1 = 2
 
         #Try to generate the links:
         bsdf_node = nodes.get("bsdf")
@@ -979,7 +990,7 @@ class MSFS_LI_material():
             if mat.msfs_emissive_texture != "":
                 #link to bsdf
                 if (bsdf_node != None and emissive_tint_mix != None):
-                    links.new(emissive_tint_mix.outputs["Color"], bsdf_node.inputs["Emission"])
+                    links.new(emissive_tint_mix.outputs[index1], bsdf_node.inputs["Emission"])
             else:
                 #unlink the separator:
                 if (bsdf_node != None and emissive_tint_mix != None):
@@ -990,6 +1001,10 @@ class MSFS_LI_material():
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
         links = mat.node_tree.links
+        if(float(version.rsplit('.', 1)[0]) < 3.4):
+            index1 = "Color2"
+        else:
+            index1 = 7
 
         albedo_detail_mix = nodes.get("albedo_detail_mix")
         detail_albedo = nodes.get("detail_albedo")
@@ -1014,6 +1029,10 @@ class MSFS_LI_material():
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
         links = mat.node_tree.links
+        if(float(version.rsplit('.', 1)[0]) < 3.4):
+            index1 = "Color2"
+        else:
+            index1 = 7
 
         metallic_detail_mix = nodes.get("metallic_detail_mix")
         detail_metallic = nodes.get("detail_metallic")
@@ -1024,12 +1043,12 @@ class MSFS_LI_material():
             if mat.msfs_detail_metallic_texture.name != "":
                 # Create the link:
                 if (detail_metallic != None and metallic_detail_mix != None):
-                    links.new(detail_metallic.outputs["Color"], metallic_detail_mix.inputs["Color2"])
+                    links.new(detail_metallic.outputs["Color"], metallic_detail_mix.inputs[index1])
                     metallic_detail_mix.inputs[0].default_value = 0.5
             else:
                 #unlink the separator:
                 if (detail_metallic != None and metallic_detail_mix != None):
-                    l = metallic_detail_mix.inputs["Color2"].links[0]
+                    l = metallic_detail_mix.inputs[index1].links[0]
                     links.remove(l)                
                     metallic_detail_mix.inputs[0].default_value = 0.0
 
@@ -1037,6 +1056,10 @@ class MSFS_LI_material():
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
         links = mat.node_tree.links
+        if(float(version.rsplit('.', 1)[0]) < 3.4):
+            index1 = "Color2"
+        else:
+            index1 = 7
 
         normal_detail_mix = nodes.get("normal_detail_mix")
         detail_normal = nodes.get("detail_normal")
@@ -1048,12 +1071,12 @@ class MSFS_LI_material():
                 if mat.msfs_detail_normal_texture.name != "":
                     # Create the link:
                     if (detail_normal != None and normal_detail_mix != None):
-                        links.new(detail_normal.outputs["Color"], normal_detail_mix.inputs["Color2"])
+                        links.new(detail_normal.outputs["Color"], normal_detail_mix.inputs[index1])
                         normal_detail_mix.inputs[0].default_value = 0.5
                 else:
                     #unlink the separator:
                     if (detail_normal != None and normal_detail_mix != None):
-                        l = normal_detail_mix.inputs["Color2"].links[0]
+                        l = normal_detail_mix.inputs[index1].links[0]
                         links.remove(l)                
                         normal_detail_mix.inputs[0].default_value = 0.0
 
@@ -1107,6 +1130,12 @@ class MSFS_LI_material():
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
         links = mat.node_tree.links
+        if(float(version.rsplit('.', 1)[0]) < 3.3):
+            index1 = "R"
+            index2 = "G"
+        else:
+            index1 = "Red"
+            index2 = "Green"
 
         clearcoat = nodes.get("clearcoat")
         clearcoat_sep = nodes.get("clearcoat_sep")
@@ -1117,8 +1146,8 @@ class MSFS_LI_material():
             mat.node_tree.nodes["clearcoat"].image.colorspace_settings.name = 'Non-Color'
             if (clearcoat_sep != None and bsdf_node != None):
                 if mat.msfs_clearcoat_texture.name != "":
-                    links.new(clearcoat_sep.outputs["R"],bsdf_node.inputs["Clearcoat"])
-                    links.new(clearcoat_sep.outputs["G"],bsdf_node.inputs["Clearcoat Roughness"])
+                    links.new(clearcoat_sep.outputs[index1],bsdf_node.inputs["Clearcoat"])
+                    links.new(clearcoat_sep.outputs[index2],bsdf_node.inputs["Clearcoat Roughness"])
                 else:
                     l = bsdf_node.inputs["Clearcoat"].links[0]
                     links.remove(l)                
@@ -1129,6 +1158,10 @@ class MSFS_LI_material():
         mat = context.active_object.active_material
         nodes = mat.node_tree.nodes
         links = mat.node_tree.links
+        if(float(version.rsplit('.', 1)[0]) < 3.4):
+            index1 = "Color2"
+        else:
+            index1 = 7
 
         #Try to generate the links:
         albedo_detail_mix = nodes.get("albedo_detail_mix")
@@ -1139,11 +1172,11 @@ class MSFS_LI_material():
             if mat.msfs_behind_glass_texture.name != "":
                 # Create the link:
                 if (behind_glass != None and albedo_detail_mix != None):
-                    links.new(behind_glass.outputs["Color"], albedo_detail_mix.inputs["Color2"])
+                    links.new(behind_glass.outputs["Color"], albedo_detail_mix.inputs[index1])
             else:
                 #unlink the separator:
                 if (behind_glass != None and albedo_detail_mix != None):
-                    l = albedo_detail_mix.inputs["Color2"].links[0]
+                    l = albedo_detail_mix.inputs[index1].links[0]
                     links.remove(l)                
 
     def match_wiper_mask(self, context):
@@ -1167,15 +1200,19 @@ class MSFS_LI_material():
     def update_color_albedo_mix(self, context):
         mat = context.active_object.active_material
         if mat.node_tree.nodes.get("bsdf", None) != None:
+            if(float(version.rsplit('.', 1)[0]) < 3.4):
+                index1 = 2
+            else:
+                index1 = "7"
             mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[0] = mat.msfs_color_albedo_mix[0]
             mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[1] = mat.msfs_color_albedo_mix[1]
             mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[2] = mat.msfs_color_albedo_mix[2]
             mat.node_tree.nodes.get("albedo_tint").outputs[0].default_value[0] = mat.msfs_color_albedo_mix[0]
             mat.node_tree.nodes.get("albedo_tint").outputs[0].default_value[1] = mat.msfs_color_albedo_mix[1]
             mat.node_tree.nodes.get("albedo_tint").outputs[0].default_value[2] = mat.msfs_color_albedo_mix[2]
-            mat.node_tree.nodes["albedo_detail_mix"].inputs[2].default_value[0] = mat.msfs_color_albedo_mix[0]
-            mat.node_tree.nodes["albedo_detail_mix"].inputs[2].default_value[1] = mat.msfs_color_albedo_mix[1]
-            mat.node_tree.nodes["albedo_detail_mix"].inputs[2].default_value[2] = mat.msfs_color_albedo_mix[2]
+            mat.node_tree.nodes["albedo_detail_mix"].inputs[index1].default_value[0] = mat.msfs_color_albedo_mix[0]
+            mat.node_tree.nodes["albedo_detail_mix"].inputs[index1].default_value[1] = mat.msfs_color_albedo_mix[1]
+            mat.node_tree.nodes["albedo_detail_mix"].inputs[index1].default_value[2] = mat.msfs_color_albedo_mix[2]
 
     def update_color_alpha_mix(self, context):
         mat = context.active_object.active_material
@@ -1187,9 +1224,13 @@ class MSFS_LI_material():
         mat = context.active_object.active_material
         #if mat.node_tree.nodes.get("bsdf", None) != None:
             #mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[3] = mat.msfs_color_alpha_mix
+        if(float(version.rsplit('.', 1)[0]) < 3.4):
+            index1 = 2
+        else:
+            index1 = "7"
         mat.node_tree.nodes.get("albedo_tint").outputs[0].default_value[3] = mat.msfs_color_base_mix
         mat.node_tree.nodes["albedo_detail_mix"].inputs[0].default_value = mat.msfs_color_base_mix
-        mat.node_tree.nodes["albedo_detail_mix"].inputs[2].default_value[3] = mat.msfs_color_base_mix
+        mat.node_tree.nodes["albedo_detail_mix"].inputs[index1].default_value[3] = mat.msfs_color_base_mix
 
     def update_color_emissive_mix(self, context):
         mat = context.active_object.active_material
@@ -1316,9 +1357,9 @@ class MSFS_LI_material():
 
     # MSFS Material properties
     # The following variables are written into the glTF file when exporting.
-    #Color blends:
-    Material.msfs_color_albedo_mix = bpy.props.FloatVectorProperty(name="Albedo Color", subtype='COLOR', min=0.0, max=1.0,size=3,default=[1.0,1.0,1.0], description="The color value set here will be mixed in with the albedo value of the material.",update=update_color_albedo_mix)
-    Material.msfs_color_emissive_mix = bpy.props.FloatVectorProperty(name="Emissive Color", subtype='COLOR', min=0.0, max=100.0, size=3,default=[0.0,0.0,0.0], description="The color value set here will be mixed in with the emissive value of the material.", update=update_color_emissive_mix)
+    # Color blends:
+    Material.msfs_color_albedo_mix = bpy.props.FloatVectorProperty(name="Albedo Color", subtype='COLOR', min=0.0, max=1.0,size=4, default=[1.0,1.0,1.0,1.0], description="The color value set here will be mixed in with the albedo value of the material.",update=update_color_albedo_mix)
+    Material.msfs_color_emissive_mix = bpy.props.FloatVectorProperty(name="Emissive Color", subtype='COLOR', min=0.0, max=1.0, size=4,default=[0.0,0.0,0.0,1.0], description="The color value set here will be mixed in with the emissive value of the material.", update=update_color_emissive_mix)
     Material.msfs_color_alpha_mix = bpy.props.FloatProperty(name="Alpha multiplier", min=0, max=1, default=1, description="The alpha value set here will be mixed in with the Alpha value of the texture.",update=update_color_alpha_mix)
     Material.msfs_color_base_mix = bpy.props.FloatProperty(name="Albedo Color Mix", min=0, max=1, default=1, description="Mix factor for the Albedo Color with the Albedo Texture.",update=update_color_base_mix)
     Material.msfs_color_sss = bpy.props.FloatVectorProperty(name="SSS Color", subtype='COLOR',min=0.0, max=1.0,size=4, default=[1.0,1.0,1.0,1.0], description = "Use the color picker to set the color of the subsurface scattering.",update=update_color_sss)
@@ -1359,8 +1400,6 @@ class MSFS_LI_material():
     Material.msfs_glass_deformation_factor = bpy.props.FloatProperty(name = "Deformation factor", min=0.0, max=1.0,default=0.0)
 
     #Pearl
-    
-
     Material.msfs_use_pearl_effect = BoolProperty(
         name="Use Pearl Effect",
         default=False
@@ -1390,7 +1429,7 @@ class MSFS_LI_material():
     Material.msfs_decal_blend_factor_normal = bpy.props.FloatProperty(name="Normal", min=0.0,max=1.0,default=1.0)
     Material.msfs_decal_blend_factor_roughness = bpy.props.FloatProperty(name="Roughness", min=0.0,max=1.0,default=1.0)
     Material.msfs_decal_blend_factor_occlusion = bpy.props.FloatProperty(name="Occlusion", min=0.0,max=1.0,default=1.0)
-    Material.msfs_decal_blend_factor_emissive = bpy.props.FloatProperty(name="Emissive", min=0.0,max=1.0,default=1.0)
+    Material.msfs_decal_blend_factor_emissive = bpy.props.FloatProperty(name="Emissive", min=0.0,max=100.0,default=1.0)
 
     #Fresnel parameters:
     Material.msfs_fresnel_factor = bpy.props.FloatProperty(name="Fresnel factor", min=0.0,max=1.0,default=1.0)

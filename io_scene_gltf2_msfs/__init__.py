@@ -860,11 +860,11 @@ class GLTF_PT_export_geometry_compression_ext_gltf(bpy.types.Panel):
     bl_space_type = 'FILE_BROWSER'
     bl_region_type = 'TOOL_PROPS'
     bl_label = "Compression"
-    bl_parent_id = "GLTF_PT_export_geometry"
+    bl_parent_id = "GLTF_PT_export_geometry_ext_gltf"
     bl_options = {'DEFAULT_CLOSED'}
 
     def __init__(self):
-        from .blender.exp import gltf2_io_draco_compression_extension
+        from .io.exp import gltf2_io_draco_compression_extension
         self.is_draco_available = gltf2_io_draco_compression_extension.dll_exists(quiet=True)
 
     @classmethod

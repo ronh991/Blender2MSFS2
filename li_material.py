@@ -776,7 +776,7 @@ class MSFS_LI_material():
             mat.msfs_show_road_material = True
 
             mat.msfs_show_ao_use_uv2 = False
-            mat.msfs_show_uv_clamp = False
+            mat.msfs_show_uv_clamp = True
             mat.msfs_show_uv_tile = False
 
             mat.msfs_show_alpha_cutoff = False
@@ -1318,8 +1318,8 @@ class MSFS_LI_material():
     # MSFS Material properties
     # The following variables are written into the glTF file when exporting.
     # Color blends:
-    Material.msfs_color_albedo_mix = bpy.props.FloatVectorProperty(name="Albedo Color", subtype='COLOR', min=0.0, max=1.0,size=4, default=[1.0,1.0,1.0,1.0], description="The color value set here will be mixed in with the albedo value of the material.",update=update_color_albedo_mix)
-    Material.msfs_color_emissive_mix = bpy.props.FloatVectorProperty(name="Emissive Color", subtype='COLOR', min=0.0, max=1.0, size=4,default=[0.0,0.0,0.0,1.0], description="The color value set here will be mixed in with the emissive value of the material.", update=update_color_emissive_mix)
+    Material.msfs_color_albedo_mix = bpy.props.FloatVectorProperty(name="Albedo Color", subtype='COLOR', min=0.0, max=1.0,size=3, default=[1.0,1.0,1.0], description="The color value set here will be mixed in with the albedo value of the material.",update=update_color_albedo_mix)
+    Material.msfs_color_emissive_mix = bpy.props.FloatVectorProperty(name="Emissive Color", subtype='COLOR', min=0.0, max=1.0, size=3,default=[0.0,0.0,0.0], description="The color value set here will be mixed in with the emissive value of the material.", update=update_color_emissive_mix)
     Material.msfs_color_alpha_mix = bpy.props.FloatProperty(name="Alpha multiplier", min=0, max=1, default=1, description="The alpha value set here will be mixed in with the Alpha value of the texture.",update=update_color_alpha_mix)
     Material.msfs_color_base_mix = bpy.props.FloatProperty(name="Albedo Color Mix", min=0, max=1, default=1, description="Mix factor for the Albedo Color with the Albedo Texture.",update=update_color_base_mix)
     Material.msfs_color_sss = bpy.props.FloatVectorProperty(name="SSS Color", subtype='COLOR',min=0.0, max=1.0,size=4, default=[1.0,1.0,1.0,1.0], description = "Use the color picker to set the color of the subsurface scattering.",update=update_color_sss)

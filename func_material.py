@@ -164,27 +164,25 @@ def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
     base_color_tint.outputs[0].default_value[0]=Material.msfs_color_albedo_mix[0]
     base_color_tint.outputs[0].default_value[1]=Material.msfs_color_albedo_mix[1]
     base_color_tint.outputs[0].default_value[2]=Material.msfs_color_albedo_mix[2]
-    base_color_tint.outputs[0].default_value[3]=Material.msfs_color_albedo_mix[3]
+    base_color_tint.outputs[0].default_value[3]=Material.msfs_color_alpha_mix
     base_color_tint_mix = CreateNewNode(Material,'ShaderNodeMixRGB',"albedo_tint_mix",location=(offset[0]+350,offset[1]+20))
     base_color_tint_mix.hide = True
     base_color_tint_mix.blend_type = 'MULTIPLY'
     base_color_tint_mix.inputs[0].default_value = 1.0
-    base_color_tint_mix.inputs[index1].default_value[0] = Material.msfs_color_albedo_mix[0]
-    base_color_tint_mix.inputs[index1].default_value[1] = Material.msfs_color_albedo_mix[0]
-    base_color_tint_mix.inputs[index1].default_value[2] = Material.msfs_color_albedo_mix[0]
-    base_color_tint_mix.inputs[index1].default_value[3] = Material.msfs_color_albedo_mix[3]
+    base_color_tint_mix.inputs[1].default_value[0] = 1.0
+    base_color_tint_mix.inputs[1].default_value[1] = 1.0
+    base_color_tint_mix.inputs[1].default_value[2] = 1.0
+
     # color detail
     base_color_detail_mix = CreateNewNode(Material,'ShaderNodeMixRGB',"albedo_detail_mix",location=(offset[0]+550,offset[1]+20))
     base_color_detail_mix.hide = True
     base_color_detail_mix.blend_type = 'MULTIPLY'
-    base_color_detail_mix.inputs[0].default_value = 1.0
-    #print( Material.msfs_color_albedo_mix[0])
-    #print( Material.msfs_color_albedo_mix)
-    base_color_detail_mix.inputs[0].default_value = 1.0
+    base_color_detail_mix.inputs[0].default_value = Material.msfs_color_base_mix
     base_color_detail_mix.inputs[index1].default_value[0] = Material.msfs_color_albedo_mix[0]
     base_color_detail_mix.inputs[index1].default_value[1] = Material.msfs_color_albedo_mix[1]
     base_color_detail_mix.inputs[index1].default_value[2] = Material.msfs_color_albedo_mix[2]
-    base_color_detail_mix.inputs[index1].default_value[3] = Material.msfs_color_albedo_mix[3]
+    base_color_detail_mix.inputs[index1].default_value[3] = Material.msfs_color_base_mix
+    # base_color_detail_mix.inputs["Color2"].default_value = (1.0,1.0,1.0,1.0)
 
     # Assign texture, if already saved in msfs data:
     if Material.msfs_albedo_texture != None:
@@ -197,8 +195,8 @@ def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
     alpha_multiply = CreateNewNode(Material,'ShaderNodeMath',"alpha_multiply",location=(offset[0]+550,offset[1]-350))
     alpha_multiply.hide = True
     alpha_multiply.operation = 'MULTIPLY'
-    alpha_multiply.inputs[0].default_value = 1.0
     alpha_multiply.inputs[1].default_value = Material.msfs_color_alpha_mix
+    alpha_multiply.inputs[0].default_value = 1.0
 
     #Link the UV:
     links.new(uv_node.outputs["UV"], base_color_node.inputs["Vector"])
@@ -668,10 +666,10 @@ def CreateMSFSWindshieldShader(Material):
     CreateBlendMask(Material,(-1000,-700))
     #CreateWiperMask(Material,(-1000,-950))
 
-    #Material.msfs_roughness_scale = 0.0
-    #Material.msfs_metallic_scale = 0.0
-    #Material.msfs_color_alpha_mix = 0.1
-    #Material.msfs_blend_mode = 'BLEND'
+    Material.msfs_roughness_scale = 0.0
+    Material.msfs_metallic_scale = 0.0
+    Material.msfs_color_alpha_mix = 0.1
+    Material.msfs_blend_mode = 'BLEND'
 
 def CreateMSFSPortholeShader(Material):
     nodes = Material.node_tree.nodes

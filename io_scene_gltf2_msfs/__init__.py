@@ -177,7 +177,7 @@ class ExportExtendedGLTF2_Base:
                ),
         description=(
             'Output format for images. PNG is lossless and generally preferred, but JPEG might be preferable for web '
-            'applications due to the smaller file size'
+            'applications due to the smaller file size. Alternatively they can be omitted if they are not needed'
         ),
         default='AUTO'
     )
@@ -860,11 +860,11 @@ class GLTF_PT_export_geometry_compression_ext_gltf(bpy.types.Panel):
     bl_space_type = 'FILE_BROWSER'
     bl_region_type = 'TOOL_PROPS'
     bl_label = "Compression"
-    bl_parent_id = "GLTF_PT_export_geometry"
+    bl_parent_id = "GLTF_PT_export_geometry_ext_gltf"
     bl_options = {'DEFAULT_CLOSED'}
 
     def __init__(self):
-        from .blender.exp import gltf2_io_draco_compression_extension
+        from .io.exp import gltf2_io_draco_compression_extension
         self.is_draco_available = gltf2_io_draco_compression_extension.dll_exists(quiet=True)
 
     @classmethod
@@ -1058,7 +1058,7 @@ class ExportExtendedGLTF2(bpy.types.Operator, ExportExtendedGLTF2_Base, ExportHe
 
 
 def menu_func_export(self, context):
-    self.layout.operator(ExportExtendedGLTF2.bl_idname, text='extended glTF 2.0 (.glb/.gltf) for MSFS (v0.42.10)')
+    self.layout.operator(ExportExtendedGLTF2.bl_idname, text='extended glTF 2.0 (.glb/.gltf) for MSFS (v0.42.14)')
 
 
 class ImportMSFSGLTF2(Operator, ImportHelper):

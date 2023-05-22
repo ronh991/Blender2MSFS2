@@ -80,6 +80,11 @@ class glTF2ExportUserExtension:
     def gather_node_hook(self, gltf2_object, blender_object, export_settings):
         import math
 
+        # First, clear all KHR_lights_punctual extensions from children. TODO: remove children?
+        for child in gltf2_object.children:
+            if child.extensions and child.extensions.get("KHR_lights_punctual"):
+                child.extensions.pop("KHR_lights_punctual")
+
         if self.properties.enabled == True:
             if gltf2_object.extensions is None:
                 gltf2_object.extensions = {}

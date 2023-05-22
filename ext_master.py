@@ -17,6 +17,7 @@
 ###################################################################################################
 
 import bpy
+version = bpy.app.version_string
 
 class ExtAsoboProperties(bpy.types.PropertyGroup):
     enabled: bpy.props.BoolProperty(
@@ -115,6 +116,12 @@ class glTF2ExportUserExtension:
     def gather_material_hook(self, gltf2_material, blender_material, export_settings):
         if (self.properties.enabled == True and blender_material.msfs_material_mode != None):
             if blender_material.msfs_material_mode != 'NONE':
+                if(float(version.rsplit('.', 1)[0]) < 3.4):
+                    index1 = "Color1"
+                    index2 = "Color2"
+                else:
+                    index1 = 6
+                    index2 = 7
                 if gltf2_material.extensions is None:
                     gltf2_material.extensions = {}
                 if gltf2_material.extras is None:
@@ -230,7 +237,7 @@ class glTF2ExportUserExtension:
                         #let's find the node:
                         node = nodes.get("albedo_detail_mix")
                         if node != None:
-                            inputs = (node.inputs["Color2"],)
+                            inputs = (node.inputs[index2],)
                         albedo_detail_texture = gather_texture_info(inputs[0], inputs, export_settings)
                         if albedo_detail_texture != None:
                             detail_extension["detailColorTexture"] = albedo_detail_texture
@@ -238,7 +245,7 @@ class glTF2ExportUserExtension:
                         #let's find the node:
                         node = nodes.get("metallic_detail_mix")
                         if node != None:
-                            inputs = (node.inputs["Color2"],)
+                            inputs = (node.inputs[index2],)
                         metallic_detail_texture = gather_texture_info(inputs[0], inputs, export_settings)
                         if metallic_detail_texture != None:
                             detail_extension["detailMetalRoughAOTexture"] = metallic_detail_texture
@@ -246,7 +253,7 @@ class glTF2ExportUserExtension:
                         #let's find the node:
                         node = nodes.get("normal_detail_mix")
                         if node != None:
-                            inputs = (node.inputs["Color2"],)
+                            inputs = (node.inputs[index2],)
                         normal_detail_texture = gather_texture_info(inputs[0], inputs, export_settings)
                         if normal_detail_texture != None:
                             detail_extension["detailNormalTexture"] = normal_detail_texture
@@ -358,7 +365,7 @@ class glTF2ExportUserExtension:
                         #let's find the node:
                         node = nodes.get("albedo_detail_mix")
                         if node != None:
-                            inputs = (node.inputs["Color2"],)
+                            inputs = (node.inputs[index2],)
                         behind_glass_texture = gather_texture_info(inputs[0], inputs, export_settings)
                         if behind_glass_texture != None:
                             parallax_extension["behindWindowMapTexture"] = behind_glass_texture

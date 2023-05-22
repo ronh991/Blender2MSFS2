@@ -220,9 +220,9 @@ def __get_image_data(sockets, export_settings) -> ExportImage:
                     # Blender 3.3 plus
                     if isinstance(elem.from_node, bpy.types.ShaderNodeSeparateColor):
                         src_chan = {
-                            'Red': Channel.Red,
-                            'Green': Channel.Green,
-                            'Blue': Channel.Blue,
+                            'Red': Channel.R,
+                            'Green': Channel.G,
+                            'Blue': Channel.B,
                         }[elem.from_socket.name]
                 if elem.from_socket.name == 'Alpha':
                     src_chan = Channel.A

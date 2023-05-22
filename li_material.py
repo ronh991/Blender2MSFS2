@@ -1203,7 +1203,8 @@ class MSFS_LI_material():
             if(float(version.rsplit('.', 1)[0]) < 3.4):
                 index1 = 2
             else:
-                index1 = "7"
+                index1 = 7
+            # does not change Alpha? why?
             mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[0] = mat.msfs_color_albedo_mix[0]
             mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[1] = mat.msfs_color_albedo_mix[1]
             mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[2] = mat.msfs_color_albedo_mix[2]
@@ -1219,15 +1220,15 @@ class MSFS_LI_material():
         if mat.node_tree.nodes.get("bsdf", None) != None:
             mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[3] = mat.msfs_color_alpha_mix
             mat.node_tree.nodes["alpha_multiply"].inputs[1].default_value = mat.msfs_color_alpha_mix
-            
+
     def update_color_base_mix(self, context):
         mat = context.active_object.active_material
-        #if mat.node_tree.nodes.get("bsdf", None) != None:
-            #mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[3] = mat.msfs_color_alpha_mix
         if(float(version.rsplit('.', 1)[0]) < 3.4):
             index1 = 2
         else:
-            index1 = "7"
+            index1 = 7
+        #if mat.node_tree.nodes.get("bsdf", None) != None:
+            #mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[3] = mat.msfs_color_alpha_mix
         mat.node_tree.nodes.get("albedo_tint").outputs[0].default_value[3] = mat.msfs_color_base_mix
         mat.node_tree.nodes["albedo_detail_mix"].inputs[0].default_value = mat.msfs_color_base_mix
         mat.node_tree.nodes["albedo_detail_mix"].inputs[index1].default_value[3] = mat.msfs_color_base_mix

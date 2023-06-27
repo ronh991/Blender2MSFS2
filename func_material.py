@@ -74,18 +74,24 @@ def MakeDither(Material):
 
     Material.blend_method = 'BLEND'
 
-def CheckbsdfData(Material,bsdf_node):
+def GetbsdfData(Material,bsdf_node):
     if bsdf_node != None:
         Material.msfs_roughness_scale = bsdf_node.inputs["Roughness"].default_value
         Material.msfs_metallic_scale = bsdf_node.inputs["Metallic"].default_value
-        Material.msfs_color_albedo_mix =  bsdf_node.inputs["Base Color"].default_value
+        Material.msfs_color_albedo_mix[0] =  bsdf_node.inputs["Base Color"].default_value[0]
+        Material.msfs_color_albedo_mix[1] =  bsdf_node.inputs["Base Color"].default_value[1]
+        Material.msfs_color_albedo_mix[2] =  bsdf_node.inputs["Base Color"].default_value[2]
+        Material.msfs_color_alpha_mix = bsdf_node.inputs["Alpha"].default_value
         print(Material.msfs_roughness_scale)
 
 def SetbsdfData(Material,bsdf_node):
     if bsdf_node != None:
         bsdf_node.inputs["Roughness"].default_value = Material.msfs_roughness_scale
         bsdf_node.inputs["Metallic"].default_value = Material.msfs_metallic_scale
-        bsdf_node.inputs["Base Color"].default_value = Material.msfs_color_albedo_mix
+        bsdf_node.inputs["Base Color"].default_value[0] = Material.msfs_color_albedo_mix[0]
+        bsdf_node.inputs["Base Color"].default_value[1] = Material.msfs_color_albedo_mix[1]
+        bsdf_node.inputs["Base Color"].default_value[2] = Material.msfs_color_albedo_mix[2]
+        #bsdf_node.inputs["Base Color"].default_value[3] = Material.msfs_color_alpha_mix
         print(Material.msfs_roughness_scale)
 
 # This function removes all nodes from the shader node tree
@@ -96,7 +102,7 @@ def RemoveShaderNodes(Material,keep_output=True):
 
     if bsdf_node is not None:
         print("Get previous bsdf data")
-        CheckbsdfData(Material,bsdf_node)
+        GetbsdfData(Material,bsdf_node)
         print(Material.msfs_roughness_scale)
 
     for idx,node in enumerate(nodes):
@@ -161,7 +167,7 @@ def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
     bsdf_node.inputs["Base Color"].default_value[0] = Material.msfs_color_albedo_mix[0]
     bsdf_node.inputs["Base Color"].default_value[1] = Material.msfs_color_albedo_mix[1]
     bsdf_node.inputs["Base Color"].default_value[2] = Material.msfs_color_albedo_mix[2]
-    bsdf_node.inputs["Base Color"].default_value[3] = Material.msfs_color_albedo_mix[3]
+    bsdf_node.inputs["Base Color"].default_value[3] = Material.msfs_color_alpha_mix
 
     # color mixer
     base_color_tint = CreateNewNode(Material,'ShaderNodeRGB',"albedo_tint",location=(offset[0]+100,offset[1]+50))
@@ -537,6 +543,7 @@ def CreateMSFSStandardShader(Material):
 
     #create the main BSDF node:
     bsdf_node = CreateNewNode(Material,'ShaderNodeBsdfPrincipled','bsdf',location=(0,400))
+    SetbsdfData(Material,bsdf_node)
 
     bsdf_node.inputs["Subsurface"].default_value = 0.0
 
@@ -607,6 +614,7 @@ def CreateMSFSGlassShader(Material):
 
     #create the main BSDF node:
     bsdf_node = CreateNewNode(Material,'ShaderNodeBsdfPrincipled','bsdf',location=(0,400))
+    SetbsdfData(Material,bsdf_node)
     
     bsdf_node.inputs["Subsurface"].default_value = 0.0    
 
@@ -624,6 +632,11 @@ def CreateMSFSDecalShader(Material):
     nodes = Material.node_tree.nodes
     links = Material.node_tree.links
 
+    bsdf_node = nodes.get("Principled BSDF")
+    hasoldbsdf = False
+    if bsdf_node is not None:
+        hasoldbsdf = True
+
     output_node = RemoveShaderNodes(Material,True)
 
     #check if there is an output node, create one if not:
@@ -632,6 +645,7 @@ def CreateMSFSDecalShader(Material):
 
     #create the main BSDF node:
     bsdf_node = CreateNewNode(Material,'ShaderNodeBsdfPrincipled','bsdf',location=(0,400))
+    SetbsdfData(Material,bsdf_node)
 
     bsdf_node.inputs["Subsurface"].default_value = 0.0    
 

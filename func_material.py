@@ -28,7 +28,7 @@ class MaterialError(Exception):
 def MakeOpaque(Material):
     #remove the alpha link:
     bsdf_node = Material.node_tree.nodes.get("bsdf")
-    if bsdf_node != None:
+    if (bsdf_node != None and mat.msfs_albedo_texture != None):
         if len(bsdf_node.inputs["Alpha"].links) > 0:
             l = bsdf_node.inputs["Alpha"].links[0]
             Material.node_tree.links.remove(l)    
@@ -42,7 +42,7 @@ def MakeMasked(Material):
     #create the alpha link:
     bsdf_node = nodes.get("bsdf")
     alpha_multiply = nodes.get("alpha_multiply")
-    if (bsdf_node != None and alpha_multiply != None):
+    if (bsdf_node != None and Material.msfs_albedo_texture != None and alpha_multiply != None):
         links.new(alpha_multiply.outputs["Value"],bsdf_node.inputs["Alpha"])
 
     Material.blend_method = 'CLIP'
@@ -54,7 +54,7 @@ def MakeTranslucent(Material):
     #create the alpha link:
     bsdf_node = nodes.get("bsdf")
     alpha_multiply = nodes.get("alpha_multiply")
-    if (bsdf_node != None and alpha_multiply != None):
+    if (bsdf_node != None and Material.msfs_albedo_texture != None and alpha_multiply != None):
         links.new(alpha_multiply.outputs["Value"],bsdf_node.inputs["Alpha"])
 
     Material.blend_method = 'BLEND'
@@ -68,26 +68,28 @@ def MakeDither(Material):
     #create the alpha link:
     bsdf_node = nodes.get("bsdf")
     alpha_multiply = nodes.get("alpha_multiply")
-    if (bsdf_node != None and alpha_multiply != None):
+    if (bsdf_node != None and Material.msfs_albedo_texture != None and alpha_multiply != None):
         links.new(alpha_multiply.outputs["Value"],bsdf_node.inputs["Alpha"])
 
     Material.blend_method = 'BLEND'
 
-def CheckbsdfData(Material,bsdf_node):
+def GetbsdfData(Material,bsdf_node):
     if bsdf_node != None:
         Material.msfs_roughness_scale = bsdf_node.inputs["Roughness"].default_value
         Material.msfs_metallic_scale = bsdf_node.inputs["Metallic"].default_value
-        Material.msfs_color_albedo_mix =  bsdf_node.inputs["Base Color"].default_value
-        print(Material.msfs_roughness_scale)
-        #Material.msfs_blend_mode = 'BLEND'
+        Material.msfs_color_albedo_mix[0] =  bsdf_node.inputs["Base Color"].default_value[0]
+        Material.msfs_color_albedo_mix[1] =  bsdf_node.inputs["Base Color"].default_value[1]
+        Material.msfs_color_albedo_mix[2] =  bsdf_node.inputs["Base Color"].default_value[2]
+        Material.msfs_color_alpha_mix = bsdf_node.inputs["Alpha"].default_value
 
 def SetbsdfData(Material,bsdf_node):
     if bsdf_node != None:
         bsdf_node.inputs["Roughness"].default_value = Material.msfs_roughness_scale
         bsdf_node.inputs["Metallic"].default_value = Material.msfs_metallic_scale
-        bsdf_node.inputs["Base Color"].default_value = Material.msfs_color_albedo_mix
-        print(Material.msfs_roughness_scale)
-        #Material.msfs_blend_mode = 'BLEND'
+        bsdf_node.inputs["Base Color"].default_value[0] = Material.msfs_color_albedo_mix[0]
+        bsdf_node.inputs["Base Color"].default_value[1] = Material.msfs_color_albedo_mix[1]
+        bsdf_node.inputs["Base Color"].default_value[2] = Material.msfs_color_albedo_mix[2]
+        bsdf_node.inputs["Base Color"].default_value[3] = Material.msfs_color_alpha_mix
 
 # This function removes all nodes from the shader node tree
 def RemoveShaderNodes(Material,keep_output=True):
@@ -97,7 +99,7 @@ def RemoveShaderNodes(Material,keep_output=True):
 
     if bsdf_node is not None:
         print("Get previous bsdf data")
-        CheckbsdfData(Material,bsdf_node)
+        GetbsdfData(Material,bsdf_node)
         print(Material.msfs_roughness_scale)
 
     for idx,node in enumerate(nodes):
@@ -156,7 +158,8 @@ def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
     bsdf_node.inputs["Base Color"].default_value[0] = Material.msfs_color_albedo_mix[0]
     bsdf_node.inputs["Base Color"].default_value[1] = Material.msfs_color_albedo_mix[1]
     bsdf_node.inputs["Base Color"].default_value[2] = Material.msfs_color_albedo_mix[2]
-    bsdf_node.inputs["Base Color"].default_value[3] = Material.msfs_color_albedo_mix[3]
+    bsdf_node.inputs["Base Color"].default_value[3] = Material.msfs_color_alpha_mix
+    bsdf_node.inputs["Alpha"].default_value = Material.msfs_color_alpha_mix
 
     # color mixer
     base_color_tint = CreateNewNode(Material,'ShaderNodeRGB',"albedo_tint",location=(offset[0]+100,offset[1]+50))
@@ -164,7 +167,7 @@ def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
     base_color_tint.outputs[0].default_value[0]=Material.msfs_color_albedo_mix[0]
     base_color_tint.outputs[0].default_value[1]=Material.msfs_color_albedo_mix[1]
     base_color_tint.outputs[0].default_value[2]=Material.msfs_color_albedo_mix[2]
-    base_color_tint.outputs[0].default_value[3]=Material.msfs_color_alpha_mix
+    base_color_tint.outputs[0].default_value[3]=Material.msfs_color_base_mix
     base_color_tint_mix = CreateNewNode(Material,'ShaderNodeMixRGB',"albedo_tint_mix",location=(offset[0]+350,offset[1]+20))
     base_color_tint_mix.hide = True
     base_color_tint_mix.blend_type = 'MULTIPLY'
@@ -178,10 +181,10 @@ def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
     base_color_detail_mix.hide = True
     base_color_detail_mix.blend_type = 'MULTIPLY'
     base_color_detail_mix.inputs[0].default_value = Material.msfs_color_base_mix
-    base_color_detail_mix.inputs[index1].default_value[0] = Material.msfs_color_albedo_mix[0]
-    base_color_detail_mix.inputs[index1].default_value[1] = Material.msfs_color_albedo_mix[1]
-    base_color_detail_mix.inputs[index1].default_value[2] = Material.msfs_color_albedo_mix[2]
-    base_color_detail_mix.inputs[index1].default_value[3] = Material.msfs_color_base_mix
+    base_color_detail_mix.inputs["Color2"].default_value[0] = Material.msfs_color_albedo_mix[0]
+    base_color_detail_mix.inputs["Color2"].default_value[1] = Material.msfs_color_albedo_mix[1]
+    base_color_detail_mix.inputs["Color2"].default_value[2] = Material.msfs_color_albedo_mix[2]
+    base_color_detail_mix.inputs["Color2"].default_value[3] = Material.msfs_color_base_mix
     # base_color_detail_mix.inputs["Color2"].default_value = (1.0,1.0,1.0,1.0)
 
     # Assign texture, if already saved in msfs data:
@@ -195,8 +198,8 @@ def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
     alpha_multiply = CreateNewNode(Material,'ShaderNodeMath',"alpha_multiply",location=(offset[0]+550,offset[1]-350))
     alpha_multiply.hide = True
     alpha_multiply.operation = 'MULTIPLY'
-    alpha_multiply.inputs[1].default_value = Material.msfs_color_alpha_mix
     alpha_multiply.inputs[0].default_value = 1.0
+    alpha_multiply.inputs[1].default_value = Material.msfs_color_alpha_mix
 
     #Link the UV:
     links.new(uv_node.outputs["UV"], base_color_node.inputs["Vector"])
@@ -461,11 +464,15 @@ def CreateMSFSStandardShader(Material):
 
     #create the main BSDF node:
     bsdf_node = CreateNewNode(Material,'ShaderNodeBsdfPrincipled','bsdf',location=(0,400))
+    SetbsdfData(Material,bsdf_node)
 
     bsdf_node.inputs["Subsurface"].default_value = 0.0
 
     #link to output
     links.new(bsdf_node.outputs["BSDF"], output_node.inputs["Surface"])
+
+    # Set alpha
+    Material.msfs_color_alpha_mix = 1.0
 
     CreatePBRBranch(Material,bsdf_node,(-1000,500))
     CreateEmissiveBranch(Material,bsdf_node,(-1000,-120))
@@ -490,8 +497,10 @@ def CreateMSFSAnisotropicShader(Material):
     #link to output
     links.new(bsdf_node.outputs["BSDF"], output_node.inputs["Surface"])
 
+    # Set alpha
+    Material.msfs_color_alpha_mix = 1.0
+
     CreatePBRBranch(Material,bsdf_node,(-1000,500))
-    CreateEmissiveBranch(Material,bsdf_node,(-1000,-120))
     CreateEmissiveBranch(Material,bsdf_node,(-1000,-120))
     CreateAnisotropicDirection(Material,bsdf_node,(-1000,-700))
     CreateDetailBranch(Material,bsdf_node,(-1000,-1250))
@@ -516,6 +525,9 @@ def CreateMSFSSSSShader(Material):
     #link to output
     links.new(bsdf_node.outputs["BSDF"], output_node.inputs["Surface"])
 
+    # Set alpha
+    Material.msfs_color_alpha_mix = 1.0
+
     CreatePBRBranch(Material,bsdf_node,(-1000,500))
     CreateEmissiveBranch(Material,bsdf_node,(-1000,-120))
     
@@ -531,11 +543,15 @@ def CreateMSFSGlassShader(Material):
 
     #create the main BSDF node:
     bsdf_node = CreateNewNode(Material,'ShaderNodeBsdfPrincipled','bsdf',location=(0,400))
+    SetbsdfData(Material,bsdf_node)
     
-    bsdf_node.inputs["Subsurface"].default_value = 0.0    
+    bsdf_node.inputs["Subsurface"].default_value = 0.0
 
     #link to output
     links.new(bsdf_node.outputs["BSDF"], output_node.inputs["Surface"])
+
+    # Set alpha
+    Material.msfs_color_alpha_mix = 0.1
 
     CreatePBRBranch(Material,bsdf_node,(-1000,500))
     CreateEmissiveBranch(Material,bsdf_node,(-1000,-120))
@@ -548,6 +564,11 @@ def CreateMSFSDecalShader(Material):
     nodes = Material.node_tree.nodes
     links = Material.node_tree.links
 
+    bsdf_node = nodes.get("Principled BSDF")
+    hasoldbsdf = False
+    if bsdf_node is not None:
+        hasoldbsdf = True
+
     output_node = RemoveShaderNodes(Material,True)
 
     #check if there is an output node, create one if not:
@@ -556,11 +577,15 @@ def CreateMSFSDecalShader(Material):
 
     #create the main BSDF node:
     bsdf_node = CreateNewNode(Material,'ShaderNodeBsdfPrincipled','bsdf',location=(0,400))
+    SetbsdfData(Material,bsdf_node)
 
     bsdf_node.inputs["Subsurface"].default_value = 0.0    
 
     #link to output
     links.new(bsdf_node.outputs["BSDF"], output_node.inputs["Surface"])
+
+    # Set alpha
+    Material.msfs_color_alpha_mix = 1.0
 
     CreatePBRBranch(Material,bsdf_node,(-1000,500))
     CreateEmissiveBranch(Material,bsdf_node,(-1000,-120))
@@ -588,6 +613,9 @@ def CreateMSFSClearcoatShader(Material):
     #link to output
     links.new(bsdf_node.outputs["BSDF"], output_node.inputs["Surface"])
 
+    # Set alpha
+    Material.msfs_color_alpha_mix = 1.0
+
     CreatePBRBranch(Material,bsdf_node,(-1000,500))
     CreateEmissiveBranch(Material,bsdf_node,(-1000,-120))
     CreateClearcoat(Material, bsdf_node,(-1000,-700))
@@ -612,6 +640,9 @@ def CreateMSFSFakeTerrainShader(Material):
     #link to output
     links.new(bsdf_node.outputs["BSDF"], output_node.inputs["Surface"])
 
+    # Set alpha
+    Material.msfs_color_alpha_mix = 1.0
+
     CreatePBRBranch(Material,bsdf_node,(-1000,500))
     CreateEmissiveBranch(Material,bsdf_node,(-1000,-120))
     CreateDetailBranch(Material,bsdf_node,(-1000,-1050))
@@ -635,6 +666,9 @@ def CreateMSFSFresnelShader(Material):
     #link to output
     links.new(bsdf_node.outputs["BSDF"], output_node.inputs["Surface"])
 
+    # Set alpha
+    Material.msfs_color_alpha_mix = 0.0
+
     CreatePBRBranch(Material,bsdf_node,(-1000,500))
     CreateEmissiveBranch(Material,bsdf_node,(-1000,-120))
 
@@ -644,6 +678,11 @@ def CreateMSFSFresnelShader(Material):
 def CreateMSFSWindshieldShader(Material):
     nodes = Material.node_tree.nodes
     links = Material.node_tree.links
+
+    bsdf_node = nodes.get("Principled BSDF")
+    hasoldbsdf = False
+    if bsdf_node is not None:
+        hasoldbsdf = True
 
     output_node = RemoveShaderNodes(Material,True)
 
@@ -660,15 +699,19 @@ def CreateMSFSWindshieldShader(Material):
     #link to output
     links.new(bsdf_node.outputs["BSDF"], output_node.inputs["Surface"])
 
+    # Set alpha
+    Material.msfs_color_alpha_mix = 0.1
+
     CreatePBRBranch(Material,bsdf_node,(-1000,500))
     CreateEmissiveBranch(Material,bsdf_node,(-1000,-120))
     CreateDetailBranch(Material,bsdf_node,(-1000,-1050))
     CreateBlendMask(Material,(-1000,-700))
     #CreateWiperMask(Material,(-1000,-950))
 
-    Material.msfs_roughness_scale = 0.0
-    Material.msfs_metallic_scale = 0.0
-    Material.msfs_color_alpha_mix = 0.1
+    if not hasoldbsdf:
+        Material.msfs_roughness_scale = 0.0
+        Material.msfs_metallic_scale = 0.0
+        Material.msfs_color_alpha_mix = 0.1
     Material.msfs_blend_mode = 'BLEND'
 
 def CreateMSFSPortholeShader(Material):
@@ -688,6 +731,9 @@ def CreateMSFSPortholeShader(Material):
 
     #link to output
     links.new(bsdf_node.outputs["BSDF"], output_node.inputs["Surface"])
+
+    # Set alpha
+    Material.msfs_color_alpha_mix = 1.0
 
     CreatePBRBranch(Material,bsdf_node,(-1000,500))
     CreateEmissiveBranch(Material,bsdf_node,(-1000,-120))
@@ -711,6 +757,9 @@ def CreateMSFSParallaxShader(Material):
 
     #link to output
     links.new(bsdf_node.outputs["BSDF"], output_node.inputs["Surface"])
+
+    # Set alpha
+    Material.msfs_color_alpha_mix = 1.0
 
     CreatePBRBranch(Material,bsdf_node,(-1000,500))
     CreateEmissiveBranch(Material,bsdf_node,(-1000,-120))
@@ -755,6 +804,9 @@ def CreateMSFSGeoDecalShader(Material):
     #link to output
     links.new(bsdf_node.outputs["BSDF"], output_node.inputs["Surface"])
 
+    # Set alpha
+    Material.msfs_color_alpha_mix = 1.0
+
     CreatePBRBranch(Material,bsdf_node,(-1000,500))
     CreateEmissiveBranch(Material,bsdf_node,(-1000,-120))
     CreateDetailBranch(Material,bsdf_node,(-1000,-500))
@@ -780,6 +832,9 @@ def CreateMSFSHairShader(Material):
     #link to output
     links.new(bsdf_node.outputs["BSDF"], output_node.inputs["Surface"])
 
+    # Set alpha
+    Material.msfs_color_alpha_mix = 1.0
+
     CreatePBRBranch(Material,bsdf_node,(-1000,500))
     CreateEmissiveBranch(Material,bsdf_node,(-1000,-120))
     CreateAnisotropicDirection(Material, bsdf_node,(-1000,-400))
@@ -800,13 +855,16 @@ def CreateMSFSInvisibleShader(Material):
     #create the main BSDF node:
     bsdf_node = CreateNewNode(Material,'ShaderNodeBsdfPrincipled',location=(0,400))
     bsdf_node.inputs["Alpha"].default_value = 0.1
-    bsdf_node.inputs["Base Color"].default_value = (0.8,0.0,0.0,1.0)
-    bsdf_node.inputs["Emission"].default_value = (0.8,0.0,0.0,1.0)
+    bsdf_node.inputs["Base Color"].default_value = (0.8,0.0,0.0,0.1)
+    bsdf_node.inputs["Emission"].default_value = (0.8,0.0,0.0,0.1)
 
     bsdf_node.inputs["Subsurface"].default_value = 0.0    
 
     #connect the nodes:
     links.new(output_node.inputs["Surface"], bsdf_node.outputs["BSDF"])
+
+    # Set alpha
+    Material.msfs_color_alpha_mix = 0.1
 
     #enable transparency:
     MakeTranslucent(Material)
@@ -825,13 +883,43 @@ def CreateMSFSEnvOccluderShader(Material):
     #create the main BSDF node:
     bsdf_node = CreateNewNode(Material,'ShaderNodeBsdfPrincipled',location=(0,400))
     bsdf_node.inputs["Alpha"].default_value = 0.3
-    bsdf_node.inputs["Base Color"].default_value = (0.0,0.8,0.0,1.0)
-    bsdf_node.inputs["Emission"].default_value = (0.0,0.8,0.0,1.0)
+    bsdf_node.inputs["Base Color"].default_value = (0.0,0.8,0.0,0.3)
+    bsdf_node.inputs["Emission"].default_value = (0.0,0.8,0.0,0.3)
 
     bsdf_node.inputs["Subsurface"].default_value = 0.0    
 
     #connect the nodes:
     links.new(output_node.inputs["Surface"], bsdf_node.outputs["BSDF"])
 
+    # Set alpha
+    Material.msfs_color_alpha_mix = 0.3
+
     #enable transparency:
     MakeTranslucent(Material)
+
+def CreateMSFSGhostShader(Material):
+    nodes = Material.node_tree.nodes
+    links = Material.node_tree.links
+
+    output_node = RemoveShaderNodes(Material,True)
+
+    #check if there is an output node, create one if not:
+    if output_node == None:
+        output_node = CreateNewNode(Material,'ShaderNodeOutputMaterial')
+
+    #create the main BSDF node:
+    bsdf_node = CreateNewNode(Material,'ShaderNodeBsdfPrincipled','bsdf',location=(0,400))
+
+    bsdf_node.inputs["Subsurface"].default_value = 0.0    
+
+    #link to output
+    links.new(bsdf_node.outputs["BSDF"], output_node.inputs["Surface"])
+
+    # Set alpha
+    Material.msfs_color_alpha_mix = 0.0
+
+    CreatePBRBranch(Material,bsdf_node,(-1000,500))
+    CreateEmissiveBranch(Material,bsdf_node,(-1000,-120))
+
+    #enable transparency:
+    Material.msfs_blend_mode = 'BLEND'

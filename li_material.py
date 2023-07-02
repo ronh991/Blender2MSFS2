@@ -528,14 +528,6 @@ class MSFS_LI_material():
             #mat.msfs_metallic_scale = 0.0
             
             #switch_msfs_blendmode()
-            if mat.msfs_blend_mode == 'BLEND':
-                MakeTranslucent(mat)
-            elif mat.msfs_blend_mode == 'MASKED':
-                MakeMasked(mat)
-            elif mat.msfs_blend_mode == 'DITHER':
-                MakeDither(mat)
-            else:
-                MakeOpaque(mat)
             
             print("Switched to msfs_windshield material.")
 
@@ -790,7 +782,7 @@ class MSFS_LI_material():
             print("Switched to msfs_invisible material.")
 
         elif mat.msfs_material_mode == 'msfs_ghost':
-            CreateMSFSFresnelShader(mat)
+            CreateMSFSGhostShader(mat)
 
             mat.msfs_show_tint = True
             mat.msfs_show_sss_color = False
@@ -1219,6 +1211,8 @@ class MSFS_LI_material():
         mat = context.active_object.active_material
         if mat.node_tree.nodes.get("bsdf", None) != None:
             mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[3] = mat.msfs_color_alpha_mix
+            mat.node_tree.nodes["bsdf"].inputs.get('Alpha').default_value = mat.msfs_color_alpha_mix
+        if mat.node_tree.nodes.get("alpha_multiply", None) != None:
             mat.node_tree.nodes["alpha_multiply"].inputs[1].default_value = mat.msfs_color_alpha_mix
 
     def update_color_base_mix(self, context):
@@ -1227,11 +1221,11 @@ class MSFS_LI_material():
             index1 = 2
         else:
             index1 = 7
-        #if mat.node_tree.nodes.get("bsdf", None) != None:
-            #mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[3] = mat.msfs_color_alpha_mix
+        if mat.node_tree.nodes.get("bsdf", None) != None:
+            mat.node_tree.nodes["bsdf"].inputs.get('Base Color').default_value[3] = mat.msfs_color_alpha_mix
         mat.node_tree.nodes.get("albedo_tint").outputs[0].default_value[3] = mat.msfs_color_base_mix
         mat.node_tree.nodes["albedo_detail_mix"].inputs[0].default_value = mat.msfs_color_base_mix
-        mat.node_tree.nodes["albedo_detail_mix"].inputs[index1].default_value[3] = mat.msfs_color_base_mix
+        mat.node_tree.nodes["albedo_detail_mix"].inputs[2].default_value[3] = mat.msfs_color_base_mix
 
     def update_color_emissive_mix(self, context):
         mat = context.active_object.active_material

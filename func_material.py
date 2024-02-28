@@ -228,11 +228,21 @@ def CreatePBRBranch(Material, bsdf_node, offset=(0.0,0.0)):
     #Let's see if the node tree already exists, if not create one.
     occlusion_node_tree = bpy.data.node_groups.get("glTF Settings")
     if occlusion_node_tree == None:
+        print("Creating new GlTf Setting node")
         #create a new node tree with one input for the occlusion:
         occlusion_node_tree = bpy.data.node_groups.new('glTF Settings', 'ShaderNodeTree')
         occlusion_node_tree.nodes.new('NodeGroupInput')
         occlusion_node_tree.inputs.new('NodeSocketFloat','Occlusion')
         occlusion_node_tree.inputs[0].default_value = (1.000)
+    else:
+        # check if .001 glTf Settings are there and merge/reassign
+        for node in Material.node_tree.nodes:
+            # Check if the node is a group node with a name "glTF Settings new"
+            if node.type == 'GROUP' and node.node_tree and ( 'glTF Settings.' in node.node_tree.name):
+                # Reassign the proper node group
+                print("Found glTf Setting.00x, reassigned")
+                node.node_tree = occlusion_node_tree
+
     #2. place a new node group in the current node tree:
     occlusion_group = CreateNewNode(Material,'ShaderNodeGroup',location=(offset[0]+1000,offset[1]+50))
     occlusion_group.node_tree = occlusion_node_tree

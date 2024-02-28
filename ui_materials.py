@@ -23,6 +23,39 @@ from bpy.types import Material
 from . li_material import *
 
 
+class MSFS_OT_glTfSettingsMaterialData(bpy.types.Operator): # TODO: Remove eventually
+    """This addon changes some of the internal property names. This current material has older properties, and is able to be migrated.\nWARNING: This removes all the old properties from the material"""
+
+    bl_idname = "msfs.gltfsetttings_material_data"
+    bl_label = "Reset glTf Settings Material Data"
+
+
+    @staticmethod
+    def gltf_settings_with_dot_present():
+        # Ensure the material has a shader node tree
+        for material in bpy.data.materials:
+            if material.use_nodes:
+                for node in material.node_tree.nodes:
+                    # Check if the node is a group node with a name "glTF Settings new"
+                    if node.type == 'GROUP' and node.node_tree and ( 'glTF Settings.' in node.node_tree.name)  :
+                        return True
+        return False
+
+    def execute(self, context):
+        # Ensure the material has a shader node tree
+        for material in bpy.data.materials:
+            if material.use_nodes:
+                for node in material.node_tree.nodes:
+                    # Check if the node is a group node with a name "glTF Settings new"
+                    if node.type == 'GROUP' and node.node_tree and ( 'glTF Settings.' in node.node_tree.name)  :
+                        # Reassign the proper node group
+                        proper_occlusion_node_tree = bpy.data.node_groups.get("glTF Settings")
+                        node.node_tree = proper_occlusion_node_tree
+                        print(f"Reassigned 'glTF Settings.xxx' to 'glTF Settings' in material  '{material.name}'",  node.node_tree.name)
+        return {"FINISHED"}
+
+
+
 class MSFS_PT_material(bpy.types.Panel):
     bl_label = "MSFS Material Params"
     bl_idname = "MSFSMATERIAL_PT_props"
@@ -38,6 +71,8 @@ class MSFS_PT_material(bpy.types.Panel):
         layout = self.layout
         
         if mat:
+            if MSFS_OT_glTfSettingsMaterialData.gltf_settings_with_dot_present():
+                layout.operator(MSFS_OT_glTfSettingsMaterialData.bl_idname)
             box=layout.box()
             box.label(text="Material Mode",icon='MATERIAL')
             
